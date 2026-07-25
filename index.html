@@ -33,7 +33,7 @@
     @keyframes fadeInUp { from { opacity:0; transform:translateY(15px); } to { opacity:1; transform:translateY(0); } }
   </style>
 </head>
-<body>
+<body class="transition-colors duration-300">
 
 <div id="app">
   <!-- HEADER -->
@@ -42,12 +42,12 @@
       <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
         <svg width="12" height="12" viewBox="0 0 14 14"><polygon points="2,1 13,7 2,13" fill="white"/></svg>
       </div>
-      <span id="logo-text" class="font-bold text-lg dark:text-white">Family Lover BD</span>
+      <span class="font-bold text-lg dark:text-white">Family Lover BD</span>
     </div>
     
     <div class="flex items-center gap-3">
        <button id="admin-btn" onclick="openAdmin()" class="hidden p-2 bg-gray-100 rounded-full dark:bg-gray-800">⚙️</button>
-       <button onclick="toggleDark()" class="p-2 bg-gray-100 rounded-full dark:bg-gray-800">🌓</button>
+       <button onclick="toggleDark()" class="p-2 bg-gray-100 rounded-full dark:bg-gray-800">🌙</button>
     </div>
   </header>
 
@@ -67,31 +67,31 @@
 
   <!-- CATEGORIES -->
   <div id="filter-bar" class="flex gap-2 px-4 py-3 no-scroll overflow-x-auto">
-    <button onclick="setCategory('all')" data-cat="all" class="cat-btn px-4 py-1.5 rounded-full text-xs font-bold bg-blue-600 text-white">All</button>
-    <button onclick="setCategory('hot')" data-cat="hot" class="cat-btn px-4 py-1.5 rounded-full text-xs font-bold bg-white border dark:bg-gray-800 dark:border-gray-700">Hot 🌶️</button>
-    <button onclick="setCategory('trending')" data-cat="trending" class="cat-btn px-4 py-1.5 rounded-full text-xs font-bold bg-white border dark:bg-gray-800 dark:border-gray-700">Viral 🚀</button>
+    <button onclick="setCategory('all')" data-cat="all" class="cat-btn px-4 py-1.5 rounded-full text-xs font-bold bg-blue-600 text-white shadow-md">All</button>
+    <button onclick="setCategory('hot')" data-cat="hot" class="cat-btn px-4 py-1.5 rounded-full text-xs font-bold bg-white border dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300">Hot 🌶️</button>
+    <button onclick="setCategory('trending')" data-cat="trending" class="cat-btn px-4 py-1.5 rounded-full text-xs font-bold bg-white border dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300">Viral 🚀</button>
   </div>
 
   <!-- MAIN FEED -->
-  <div id="feed" class="px-4"></div>
+  <div id="feed" class="px-4 pb-10"></div>
 
   <!-- FOOTER -->
-  <footer class="mt-10 py-10 text-center border-t border-gray-200 dark:border-gray-800 transition-colors">
-    <p class="text-sm text-gray-500 dark:text-gray-400">© 2025 Family Lover BD. All Rights Reserved.</p>
+  <footer class="mt-10 py-10 text-center border-t border-gray-200 dark:border-gray-800">
+    <p class="text-sm text-gray-500 dark:text-gray-400">© 2025 Family Lover BD.</p>
     <p class="text-xs text-gray-400 dark:text-gray-600 mt-1 uppercase tracking-widest">Designed by Wanda</p>
   </footer>
 </div>
 
 <!-- AD SCREEN -->
 <div id="ad-screen" class="hidden fixed inset-0 z-50 bg-white flex flex-col items-center justify-center p-6 dark:bg-[#0f172a]">
-  <div id="ad-timer" class="mb-6 bg-black text-white px-6 py-2 rounded-full font-mono text-2xl font-bold">00:14</div>
+  <div id="ad-timer" class="mb-6 bg-black text-white px-6 py-2 rounded-full font-mono text-2xl font-bold border-2 border-blue-500">00:14</div>
   
   <div class="bg-gray-50 dark:bg-[#1e1e1e] w-full max-w-sm rounded-3xl border border-gray-100 dark:border-gray-700 shadow-2xl p-8 text-center">
     <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
       <span class="text-3xl">🎁</span>
     </div>
     <h2 class="text-xl font-bold mb-2 dark:text-white">Unlock Content</h2>
-    <p class="text-gray-500 text-sm mb-8 leading-relaxed">Watch the ad completely to unlock your destination link. Please wait for the timer.</p>
+    <p class="text-gray-500 text-sm mb-8 leading-relaxed">অ্যাডটি সম্পূর্ণ দেখুন এবং ক্লিক করুন। টাইমার শেষ হলে 'Continue' বাটনে ক্লিক করুন।</p>
     
     <button onclick="triggerMonetag()" class="w-full py-4 bg-orange-500 text-white rounded-2xl font-bold shadow-lg active:scale-95 transition-all">
        🚀 Show Ad & Unlock
@@ -107,25 +107,25 @@
 <!-- ADMIN MODAL -->
 <div id="admin-modal" class="hidden fixed inset-0 z-50 bg-white overflow-y-auto p-4 dark:bg-[#121212]">
   <div class="flex justify-between items-center mb-6 border-b pb-4">
-    <h1 class="text-xl font-bold">Admin Panel ⚙️</h1>
+    <h1 class="text-xl font-bold dark:text-white">Admin Panel ⚙️</h1>
     <button onclick="closeAdmin()" class="text-red-500 font-bold">Close ✖</button>
   </div>
 
   <div class="flex gap-2 mb-6">
-    <button onclick="adminTab('add')" class="flex-1 py-2 bg-gray-100 rounded-lg text-sm font-bold dark:bg-gray-800">Add Post</button>
-    <button onclick="adminTab('manage')" class="flex-1 py-2 bg-gray-100 rounded-lg text-sm font-bold dark:bg-gray-800">Manage All</button>
+    <button onclick="adminTab('add')" class="flex-1 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm font-bold dark:bg-gray-800 dark:text-white">Add Post</button>
+    <button onclick="adminTab('manage')" class="flex-1 py-2 bg-gray-100 rounded-lg text-sm font-bold dark:bg-gray-800 dark:text-white">Manage All</button>
   </div>
 
   <div id="admin-add" class="space-y-4">
-    <input id="f-title" type="text" placeholder="Video Title" class="w-full p-3 border rounded-xl dark:bg-gray-800 dark:border-gray-700">
-    <input id="f-thumb" type="text" placeholder="Image Link" class="w-full p-3 border rounded-xl dark:bg-gray-800 dark:border-gray-700">
-    <input id="f-url" type="text" placeholder="Video/Target Link" class="w-full p-3 border rounded-xl dark:bg-gray-800 dark:border-gray-700">
-    <select id="f-cat" class="w-full p-3 border rounded-xl dark:bg-gray-800 dark:border-gray-700">
+    <input id="f-title" type="text" placeholder="Video Title" class="w-full p-3 border rounded-xl dark:bg-gray-800 dark:border-gray-700 dark:text-white">
+    <input id="f-thumb" type="text" placeholder="Image Link (https://...)" class="w-full p-3 border rounded-xl dark:bg-gray-800 dark:border-gray-700 dark:text-white">
+    <input id="f-url" type="text" placeholder="Video/Target Link" class="w-full p-3 border rounded-xl dark:bg-gray-800 dark:border-gray-700 dark:text-white">
+    <select id="f-cat" class="w-full p-3 border rounded-xl dark:bg-gray-800 dark:border-gray-700 dark:text-white">
         <option value="all">Default</option>
         <option value="hot">Hot 🌶️</option>
         <option value="trending">Trending 🚀</option>
     </select>
-    <button onclick="submitPost()" class="w-full py-4 bg-blue-600 text-white rounded-xl font-bold">Publish</button>
+    <button onclick="submitPost()" class="w-full py-4 bg-blue-600 text-white rounded-xl font-bold">Publish Now</button>
   </div>
 
   <div id="admin-manage" class="hidden space-y-4">
@@ -134,6 +134,7 @@
 </div>
 
 <script>
+// Initialize Supabase
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let allPosts = [];
 let currentUserId = 'unknown';
@@ -142,7 +143,7 @@ let adTimerInterval = null;
 let adSeconds = 14;
 let unlockProgress = {};
 
-// Monetag Script Injection
+// Monetag Script Integration
 (function() {
     const s = document.createElement('script');
     s.src = `https://groleegni.net/401/${MONETAG_ZONE_ID}`;
@@ -150,29 +151,40 @@ let unlockProgress = {};
     document.head.appendChild(s);
 })();
 
+// Telegram & App Initial Load
 window.addEventListener('DOMContentLoaded', async () => {
   const tg = window.Telegram?.WebApp;
   if (tg) {
     tg.expand();
     currentUserId = tg.initDataUnsafe?.user?.id?.toString() || 'unknown';
   }
-  if (currentUserId === ADMIN_TELEGRAM_ID) document.getElementById('admin-btn').classList.remove('hidden');
+  
+  // Show Admin Button if ID matches
+  if (currentUserId === ADMIN_TELEGRAM_ID) {
+      document.getElementById('admin-btn').classList.remove('hidden');
+  }
+
   await loadPosts();
+  await loadUnlockProgress();
 });
 
 async function loadPosts() {
-  const { data } = await sb.from('posts').select('*').eq('is_active', true).order('created_at', { ascending: false });
+  const { data, error } = await sb.from('posts').select('*').order('created_at', { ascending: false });
+  if (error) console.error("Error loading posts:", error);
   if (data) {
     allPosts = data;
     renderSlider();
     renderFeed(allPosts);
-    loadUnlockProgress();
   }
 }
 
 function renderSlider() {
   const slider = document.getElementById('slider');
   const trending = [...allPosts].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 5);
+  if(trending.length === 0) {
+      slider.innerHTML = `<p class="text-center w-full text-gray-400 py-4">No trending videos</p>`;
+      return;
+  }
   slider.innerHTML = trending.map(p => `
     <div class="slider-item" onclick="openAdScreen(${p.id})">
       <img src="${p.thumbnail_url}" class="w-full h-full object-cover">
@@ -186,6 +198,10 @@ function renderSlider() {
 
 function renderFeed(posts) {
   const feed = document.getElementById('feed');
+  if(posts.length === 0) {
+      feed.innerHTML = `<div class="text-center py-20 text-gray-500">No videos found.</div>`;
+      return;
+  }
   feed.innerHTML = posts.map(p => `
     <div class="bg-white dark:bg-[#1e1e1e] rounded-2xl overflow-hidden mb-5 shadow-sm card-anim border border-gray-100 dark:border-gray-800">
       <div class="relative" onclick="openAdScreen(${p.id})">
@@ -203,35 +219,18 @@ function renderFeed(posts) {
 function getButtonHTML(p) {
   const prog = unlockProgress[p.id] || { ad_count: 0, unlocked: false };
   if (prog.unlocked) {
-    return `<a href="${p.target_url}" target="_blank" onclick="incrementCount(${p.id}, 'downloads')" class="block w-full py-3 bg-green-500 text-white text-center rounded-xl font-bold">Download / Watch Now</a>`;
+    return `<a href="${p.target_url}" target="_blank" onclick="incrementCount(${p.id}, 'views')" class="block w-full py-3 bg-green-500 text-white text-center rounded-xl font-bold shadow-lg">Watch Now ✅</a>`;
   }
-  return `<button onclick="openAdScreen(${p.id})" class="w-full py-3 unlock-btn text-white rounded-xl font-bold flex items-center justify-center gap-2">
-    🔒 Unlock Link (${prog.ad_count}/${ADS_REQUIRED})
+  return `<button onclick="openAdScreen(${p.id})" class="w-full py-3 unlock-btn text-white rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg">
+    🔓 Unlock Link (${prog.ad_count}/${ADS_REQUIRED})
   </button>`;
-}
-
-function handleSearch() {
-  const query = document.getElementById('search-input').value.toLowerCase();
-  const filtered = allPosts.filter(p => p.title.toLowerCase().includes(query));
-  renderFeed(filtered);
-}
-
-function setCategory(cat) {
-  document.querySelectorAll('.cat-btn').forEach(btn => {
-    btn.classList.remove('bg-blue-600', 'text-white');
-    if(btn.dataset.cat === cat) btn.classList.add('bg-blue-600', 'text-white');
-  });
-  const filtered = cat === 'all' ? allPosts : allPosts.filter(p => p.category === cat);
-  renderFeed(filtered);
 }
 
 async function incrementCount(id, field) {
   const post = allPosts.find(p => p.id === id);
   if (post) {
     const newVal = (post[field] || 0) + 1;
-    post[field] = newVal;
     await sb.from('posts').update({ [field]: newVal }).eq('id', id);
-    if(field === 'views') renderSlider();
   }
 }
 
@@ -239,10 +238,13 @@ function openAdScreen(postId) {
   currentAdPostId = postId;
   adSeconds = 14;
   incrementCount(postId, 'views');
+  
   document.getElementById('ad-screen').classList.remove('hidden');
   const btn = document.getElementById('continue-btn');
   btn.disabled = true;
   btn.classList.add('opacity-50', 'cursor-not-allowed');
+  btn.innerText = "Please wait...";
+
   clearInterval(adTimerInterval);
   adTimerInterval = setInterval(() => {
     adSeconds--;
@@ -251,26 +253,47 @@ function openAdScreen(postId) {
       clearInterval(adTimerInterval);
       btn.disabled = false;
       btn.classList.remove('opacity-50', 'cursor-not-allowed');
+      btn.innerText = "Continue";
     }
   }, 1000);
+  
   triggerMonetag();
 }
 
 function triggerMonetag() {
+  // Monetag Onclick
   if (typeof window.__monetag_onclick === 'function') {
       window.__monetag_onclick();
+  } else {
+      // Fallback
+      window.open('https://groleegni.net/401/' + MONETAG_ZONE_ID, '_blank');
   }
 }
 
 async function adComplete() {
   const id = currentAdPostId;
-  const prog = unlockProgress[id] || { ad_count: 0, unlocked: false };
+  let prog = unlockProgress[id] || { ad_count: 0, unlocked: false };
+  
   prog.ad_count++;
-  if (prog.ad_count >= ADS_REQUIRED) prog.unlocked = true;
+  if (prog.ad_count >= ADS_REQUIRED) {
+      prog.unlocked = true;
+  }
+  
   unlockProgress[id] = prog;
-  await sb.from('ad_watches').upsert({ telegram_user_id: currentUserId, post_id: id, ad_count: prog.ad_count, unlocked: prog.unlocked }, { onConflict: 'telegram_user_id,post_id' });
+
+  // Save to Database
+  const { error } = await sb.from('ad_watches').upsert({ 
+      telegram_user_id: currentUserId, 
+      post_id: id, 
+      ad_count: prog.ad_count, 
+      unlocked: prog.unlocked 
+  }, { onConflict: 'telegram_user_id,post_id' });
+
+  if(error) console.error("Database Save Error:", error);
+
   renderFeed(allPosts);
   closeAdScreen();
+  alert(prog.unlocked ? "Content Unlocked!" : `Progress: ${prog.ad_count}/${ADS_REQUIRED} ads watched.`);
 }
 
 function closeAdScreen() {
@@ -280,15 +303,19 @@ function closeAdScreen() {
 
 async function loadUnlockProgress() {
   if (currentUserId === 'unknown') return;
-  const { data } = await sb.from('ad_watches').select('*').eq('telegram_user_id', currentUserId);
+  const { data, error } = await sb.from('ad_watches').select('*').eq('telegram_user_id', currentUserId);
   if (data) {
-    data.forEach(d => { unlockProgress[d.post_id] = { ad_count: d.ad_count, unlocked: d.unlocked }; });
+    data.forEach(d => { 
+        unlockProgress[d.post_id] = { ad_count: d.ad_count, unlocked: d.unlocked }; 
+    });
     renderFeed(allPosts);
   }
 }
 
+// ADMIN FUNCTIONS
 function openAdmin() { document.getElementById('admin-modal').classList.remove('hidden'); }
 function closeAdmin() { document.getElementById('admin-modal').classList.add('hidden'); }
+
 function adminTab(tab) {
     document.getElementById('admin-add').classList.toggle('hidden', tab !== 'add');
     document.getElementById('admin-manage').classList.toggle('hidden', tab !== 'manage');
@@ -300,9 +327,23 @@ async function submitPost() {
   const thumb = document.getElementById('f-thumb').value;
   const url = document.getElementById('f-url').value;
   const cat = document.getElementById('f-cat').value;
-  if(!title || !thumb || !url) return alert("Fill all fields");
-  const { error } = await sb.from('posts').insert([{ title, thumbnail_url: thumb, target_url: url, category: cat }]);
-  if(!error) { alert("Published!"); location.reload(); }
+
+  if(!title || !thumb || !url) return alert("সবগুলো বক্স পূরণ করুন!");
+
+  const { error } = await sb.from('posts').insert([{ 
+      title, 
+      thumbnail_url: thumb, 
+      target_url: url, 
+      category: cat,
+      views: 0 
+  }]);
+
+  if(error) {
+      alert("Error: " + error.message);
+  } else {
+      alert("সফলভাবে পাবলিশ হয়েছে!");
+      location.reload();
+  }
 }
 
 async function loadAdminList() {
@@ -312,21 +353,42 @@ async function loadAdminList() {
     <div class="p-3 border rounded-xl mb-2 flex items-center gap-3 bg-gray-50 dark:bg-gray-800 dark:border-gray-700">
       <img src="${p.thumbnail_url}" class="w-12 h-12 rounded object-cover">
       <div class="flex-1">
-        <p class="text-sm font-bold dark:text-white">${p.title}</p>
+        <p class="text-sm font-bold dark:text-white line-clamp-1">${p.title}</p>
         <p class="text-[10px] text-gray-500">Views: ${p.views || 0}</p>
       </div>
-      <button onclick="deletePost(${p.id})" class="text-red-500 text-sm">Delete</button>
+      <button onclick="deletePost(${p.id})" class="text-red-500 text-sm font-bold">Delete</button>
     </div>
   `).join('');
 }
 
 async function deletePost(id) {
-    if(confirm("Delete?")) { await sb.from('posts').delete().eq('id', id); loadAdminList(); }
+    if(confirm("আপনি কি নিশ্চিত এটি ডিলিট করতে চান?")) {
+        const { error } = await sb.from('posts').delete().eq('id', id);
+        if(!error) loadAdminList();
+    }
+}
+
+function handleSearch() {
+  const query = document.getElementById('search-input').value.toLowerCase();
+  const filtered = allPosts.filter(p => p.title.toLowerCase().includes(query));
+  renderFeed(filtered);
+}
+
+function setCategory(cat) {
+  document.querySelectorAll('.cat-btn').forEach(btn => {
+    btn.classList.remove('bg-blue-600', 'text-white', 'shadow-md');
+    btn.classList.add('bg-white', 'dark:bg-gray-800');
+    if(btn.dataset.cat === cat) {
+        btn.classList.add('bg-blue-600', 'text-white', 'shadow-md');
+        btn.classList.remove('bg-white', 'dark:bg-gray-800');
+    }
+  });
+  const filtered = cat === 'all' ? allPosts : allPosts.filter(p => p.category === cat);
+  renderFeed(filtered);
 }
 
 function toggleDark() {
   document.documentElement.classList.toggle('dark');
-  document.body.classList.toggle('dark-mode');
 }
 </script>
 </body>
