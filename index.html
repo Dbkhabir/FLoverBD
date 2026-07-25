@@ -123,6 +123,36 @@
   body.dark .mini.edit{background:#272c55;color:#a5b4fc}
   body.dark .mini.del{background:#451c1c;color:#fca5a5}
 
+  /* Premium admin */
+  .acard{background:var(--bg);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin-bottom:14px}
+  .acard h3{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:4px;display:flex;align-items:center;gap:7px}
+  .srow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+  .srow:last-child{border-bottom:none}
+  .srow .sl{font-size:13.5px;font-weight:600}
+  .srow .sl small{display:block;font-weight:500;font-size:11.5px;color:var(--muted);margin-top:2px}
+  .srow select,.srow input[type=number]{width:86px;padding:8px 10px;border-radius:10px;border:1.5px solid var(--line);background:var(--card);color:var(--text);font-size:13.5px;font-weight:700;text-align:center;outline:none;font-family:inherit}
+  .sw{position:relative;display:inline-block;width:46px;height:26px;flex:none}
+  .sw input{opacity:0;width:0;height:0}
+  .sw span{position:absolute;inset:0;background:var(--line);border-radius:26px;transition:.25s;cursor:pointer}
+  .sw span:before{content:"";position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.25s;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+  .sw input:checked+span{background:linear-gradient(135deg,var(--primary),var(--primary2))}
+  .sw input:checked+span:before{transform:translateX(20px)}
+  .apost{display:flex;align-items:center;gap:11px;padding:9px 0;border-bottom:1px solid var(--line)}
+  .apost:last-child{border-bottom:none}
+  .apost .ath{width:52px;height:38px;border-radius:9px;background:var(--line);object-fit:cover;flex:none;display:flex;align-items:center;justify-content:center;color:var(--muted);overflow:hidden}
+  .apost .ath img{width:100%;height:100%;object-fit:cover}
+  .apost .ainfo{flex:1;min-width:0}
+  .apost .ainfo .at{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .apost .ainfo .am{font-size:11px;color:var(--muted);margin-top:2px;display:flex;gap:9px;align-items:center}
+  .tagchip{display:inline-flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--line);border-radius:99px;padding:6px 7px 6px 13px;font-size:12.5px;font-weight:700;margin:4px 6px 2px 0}
+  .tagchip button{border:none;background:#fee2e2;color:#dc2626;width:20px;height:20px;border-radius:50%;font-size:12px;cursor:pointer;line-height:1}
+  body.dark .tagchip button{background:#451c1c;color:#fca5a5}
+  .ibtn{width:30px;height:30px;border-radius:9px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none}
+  .ibtn.edit{background:#e0e7ff;color:#4338f5}.ibtn.del{background:#fee2e2;color:#dc2626}
+  body.dark .ibtn.edit{background:#272c55;color:#a5b4fc}
+  body.dark .ibtn.del{background:#451c1c;color:#fca5a5}
+  .loadmore{display:block;margin:18px auto 0;padding:12px 30px;border-radius:13px;border:1.5px solid var(--line);background:var(--card);color:var(--text);font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit}
+
   .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(90px);background:#111827;color:#fff;padding:12px 22px;border-radius:14px;font-size:13.5px;z-index:200;transition:transform .3s;max-width:88vw;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.3)}
   .toast.show{transform:translateX(-50%) translateY(0)}
 </style>
@@ -174,8 +204,7 @@ const CONFIG = {
 <div class="empty" id="empty" style="display:none">No posts found</div>
 
 <footer>
-  <div class="fbrand">Family Lover BD</div>
-  <p>Watch &amp; download your favorite videos.<br/>&copy; 2025 Family Lover BD. All Rights Reserved.</p>
+  <p>&copy; 2025 Family Lover BD. All Rights Reserved.</p>
 </footer>
 </main>
 
@@ -193,20 +222,40 @@ const CONFIG = {
       <div class="btnrow"><button class="btn primary" onclick="adminLogin()">Sign In</button></div>
     </div>
     <div id="adminMain" style="display:none">
-      <h2 style="font-size:15px">Settings</h2>
-      <label>Ads required to unlock a link</label>
-      <select id="setAdsRequired"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
-      <label>Automatic ads (shown while browsing the site)</label>
-      <select id="setInApp"><option value="true">On</option><option value="false">Off</option></select>
-      <div class="btnrow" style="margin:12px 0 18px"><button class="btn primary" onclick="saveSettings()">Save Settings</button></div>
-      <div class="btnrow" style="margin:0 0 14px">
-        <button class="btn primary" onclick="openOverlay('postOverlay',()=>openPostForm())">＋ New Post</button>
-        <button class="btn ghost" onclick="openOverlay('catOverlay',openCatForm)">＋ Category</button>
+      <div class="acard">
+        <h3>⚙️ Settings</h3>
+        <div class="srow">
+          <div class="sl">Ads to unlock a link<small>How many ads before the link opens</small></div>
+          <select id="setAdsRequired"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+        </div>
+        <div class="srow">
+          <div class="sl">Automatic ads<small>Interstitial ads while browsing</small></div>
+          <label class="sw"><input type="checkbox" id="setInApp"><span></span></label>
+        </div>
+        <div class="srow">
+          <div class="sl">Posts per page<small>Load More shows the rest</small></div>
+          <select id="setPerPage"><option>5</option><option>10</option><option>15</option><option>20</option><option>30</option></select>
+        </div>
+        <div class="srow">
+          <div class="sl">Auto trending<small>Popular posts go to Trending automatically</small></div>
+          <label class="sw"><input type="checkbox" id="setAutoTrend"><span></span></label>
+        </div>
+        <div class="srow">
+          <div class="sl">Trending threshold<small>Minimum views for auto trending</small></div>
+          <input type="number" id="setTrendViews" min="1" step="100" />
+        </div>
+        <div class="btnrow" style="margin-top:14px"><button class="btn primary" onclick="saveSettings()">Save Settings</button></div>
       </div>
-      <h2 style="font-size:15px">All Posts</h2>
-      <div id="adminPosts"></div>
-      <h2 style="font-size:15px;margin-top:18px">Categories</h2>
-      <div id="adminCats"></div>
+      <div class="acard">
+        <h3>🎬 Posts</h3>
+        <div id="adminPosts"></div>
+        <div class="btnrow" style="margin-top:12px"><button class="btn primary" onclick="openOverlay('postOverlay',()=>openPostForm())">＋ New Post</button></div>
+      </div>
+      <div class="acard">
+        <h3>🏷️ Categories</h3>
+        <div id="adminCats"></div>
+        <div class="btnrow" style="margin-top:12px"><button class="btn ghost" onclick="openOverlay('catOverlay',openCatForm)">＋ New Category</button></div>
+      </div>
     </div>
     <div class="btnrow"><button class="btn ghost" onclick="closeTopOverlay()">Close</button></div>
   </div>
@@ -309,36 +358,57 @@ document.querySelectorAll(".overlay").forEach(ov =>
   ov.addEventListener("click", e => { if (e.target === ov) closeTopOverlay(); }));
 
 /* ---------- Settings ---------- */
-let settings = { ads_required: CONFIG.ADS_REQUIRED, inapp_ads: CONFIG.ENABLE_INAPP_ADS };
+let settings = {
+  ads_required: CONFIG.ADS_REQUIRED,
+  inapp_ads: CONFIG.ENABLE_INAPP_ADS,
+  posts_per_page: 10,
+  auto_trending: false,
+  trending_min_views: 1000
+};
+let settingsLoaded = false;
 let inAppStarted = false;
 function maybeStartInAppAds() {
   const fn = getAdFn();
-  if (!inAppStarted && settings.inapp_ads && fn) {
-    inAppStarted = true;
-    fn({ type: "inApp", inAppSettings: { frequency: 2, capping: 0.1, interval: 30, timeout: 5, everyPage: false } });
-  }
+  // wait until saved settings are loaded, so a saved "off" isn't overridden by the default
+  if (!settingsLoaded || inAppStarted || !settings.inapp_ads || !fn) return;
+  inAppStarted = true;
+  fn({ type: "inApp", inAppSettings: { frequency: 2, capping: 0.1, interval: 30, timeout: 5, everyPage: false } });
 }
 async function loadSettings() {
-  if (DEMO) return;
+  if (DEMO) { settingsLoaded = true; return; }
   const { data, error } = await sb.from("settings").select("*");
-  if (error || !data) return;
+  settingsLoaded = true;
+  if (error || !data) { maybeStartInAppAds(); return; }
   const map = Object.fromEntries(data.map(r => [r.key, r.value]));
   if (map.ads_required) settings.ads_required = Math.max(1, Number(map.ads_required) || CONFIG.ADS_REQUIRED);
   if (map.inapp_ads !== undefined) settings.inapp_ads = map.inapp_ads === "true";
+  if (map.posts_per_page) settings.posts_per_page = Math.max(1, Number(map.posts_per_page) || 10);
+  if (map.auto_trending !== undefined) settings.auto_trending = map.auto_trending === "true";
+  if (map.trending_min_views) settings.trending_min_views = Math.max(1, Number(map.trending_min_views) || 1000);
+  visibleCount = settings.posts_per_page;
   maybeStartInAppAds();
 }
 async function saveSettings() {
-  const adsReq = document.getElementById("setAdsRequired").value;
-  const inApp = document.getElementById("setInApp").value;
+  const vals = {
+    ads_required: document.getElementById("setAdsRequired").value,
+    inapp_ads: String(document.getElementById("setInApp").checked),
+    posts_per_page: document.getElementById("setPerPage").value,
+    auto_trending: String(document.getElementById("setAutoTrend").checked),
+    trending_min_views: String(Math.max(1, Number(document.getElementById("setTrendViews").value) || 1000))
+  };
   if (DEMO) { showToast("Demo mode"); return; }
-  const { error } = await sb.from("settings").upsert([
-    { key: "ads_required", value: String(adsReq) },
-    { key: "inapp_ads", value: inApp }
-  ]);
+  const { error } = await sb.from("settings").upsert(Object.entries(vals).map(([key, value]) => ({ key, value: String(value) })));
   if (error) { showToast("Save failed: " + error.message); return; }
-  settings.ads_required = Number(adsReq);
-  settings.inapp_ads = inApp === "true";
-  showToast("Settings saved");
+  const wasOn = settings.inapp_ads;
+  settings.ads_required = Number(vals.ads_required);
+  settings.inapp_ads = vals.inapp_ads === "true";
+  settings.posts_per_page = Number(vals.posts_per_page);
+  settings.auto_trending = vals.auto_trending === "true";
+  settings.trending_min_views = Number(vals.trending_min_views);
+  visibleCount = settings.posts_per_page;
+  if (settings.inapp_ads && !wasOn) maybeStartInAppAds();
+  if (!settings.inapp_ads && inAppStarted) showToast("Settings saved — automatic ads stop on next app open");
+  else showToast("Settings saved");
   render();
 }
 
@@ -388,17 +458,22 @@ function render() {
     (activeCat === "all" || p.category_id == activeCat) &&
     (!q || (p.title || "").toLowerCase().includes(q)));
 
-  const trending = filtered.filter(p => p.is_trending);
+  const isTrending = p => p.is_trending || (settings.auto_trending && (p.views || 0) >= settings.trending_min_views);
+  const trending = filtered.filter(isTrending).sort((a, b) => (b.views || 0) - (a.views || 0));
   document.getElementById("trendingSection").style.display = trending.length ? "" : "none";
   document.getElementById("trendingRow").innerHTML = trending.map((p, i) => cardHTML(p, i + 1)).join("");
 
-  document.getElementById("list").innerHTML = filtered.map(p => cardHTML(p)).join("");
+  const shown = filtered.slice(0, visibleCount);
+  document.getElementById("list").innerHTML = shown.map(p => cardHTML(p)).join("") +
+    (filtered.length > visibleCount ? `<button class="loadmore" onclick="loadMore()">Load More (${filtered.length - visibleCount} more)</button>` : "");
   document.getElementById("empty").style.display = filtered.length ? "none" : "";
 
   const isAdmin = (tgUserId && tgUserId === String(CONFIG.ADMIN_TELEGRAM_ID)) || new URLSearchParams(location.search).get("admin") === "1";
   document.getElementById("adminFab").style.display = isAdmin ? "block" : "none";
 }
-function setCat(id) { activeCat = id; render(); }
+function setCat(id) { activeCat = id; visibleCount = settings.posts_per_page; render(); }
+let visibleCount = settings.posts_per_page;
+function loadMore() { visibleCount += settings.posts_per_page; render(); }
 
 function cardHTML(p, topRank) {
   const REQ = settings.ads_required;
@@ -465,10 +540,16 @@ async function goToLink(p) {
 }
 
 /* ---------- Admin ---------- */
-async function openAdmin() {
-  if (DEMO) { document.getElementById("adminMain").style.display = ""; renderAdmin(); return; }
+function fillSettingsForm() {
   document.getElementById("setAdsRequired").value = String(settings.ads_required);
-  document.getElementById("setInApp").value = String(settings.inapp_ads);
+  document.getElementById("setInApp").checked = settings.inapp_ads;
+  document.getElementById("setPerPage").value = String(settings.posts_per_page);
+  document.getElementById("setAutoTrend").checked = settings.auto_trending;
+  document.getElementById("setTrendViews").value = settings.trending_min_views;
+}
+async function openAdmin() {
+  fillSettingsForm();
+  if (DEMO) { document.getElementById("adminMain").style.display = ""; renderAdmin(); return; }
   sb.auth.getSession().then(({ data }) => {
     if (data.session) { document.getElementById("adminMain").style.display = ""; document.getElementById("adminLogin").style.display = "none"; renderAdmin(); }
     else { document.getElementById("adminLogin").style.display = ""; document.getElementById("adminMain").style.display = "none"; }
@@ -482,14 +563,22 @@ async function adminLogin() {
   if (error) { showToast("Sign in failed: " + error.message); return; }
   showToast("Signed in"); openAdmin();
 }
+const ICON_PEN = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>`;
+const ICON_TRASH = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>`;
 function renderAdmin() {
-  document.getElementById("adminPosts").innerHTML = posts.map(p =>
-    `<div class="admin-list-item"><div class="t">${esc(p.title)}</div>
-      <button class="mini edit" onclick="openOverlay('postOverlay',()=>openPostForm(${p.id}))">Edit</button>
-      <button class="mini del" onclick="deletePost(${p.id})">Delete</button></div>`).join("") || "<div class='empty'>No posts yet</div>";
+  document.getElementById("adminPosts").innerHTML = posts.map(p => {
+    const trendTag = p.is_trending || (settings.auto_trending && (p.views || 0) >= settings.trending_min_views) ? " · 🔥" : "";
+    const th = p.thumbnail_url ? `<img src="${esc(p.thumbnail_url)}" loading="lazy" onerror="this.remove()" />` : ICON_PLAY;
+    return `<div class="apost">
+      <div class="ath">${th}</div>
+      <div class="ainfo"><div class="at">${esc(p.title)}</div>
+        <div class="am">${fmt(p.views || 0)} views · ${fmt(p.downloads || 0)} downloads${trendTag}</div></div>
+      <button class="ibtn edit" aria-label="Edit" onclick="openOverlay('postOverlay',()=>openPostForm(${p.id}))">${ICON_PEN}</button>
+      <button class="ibtn del" aria-label="Delete" onclick="deletePost(${p.id})">${ICON_TRASH}</button>
+    </div>`;
+  }).join("") || "<div class='empty'>No posts yet</div>";
   document.getElementById("adminCats").innerHTML = cats.map(c =>
-    `<div class="admin-list-item"><div class="t">${esc(c.name)}</div>
-      <button class="mini del" onclick="deleteCat(${c.id})">Delete</button></div>`).join("") || "<div class='empty'>No categories yet</div>";
+    `<span class="tagchip">${esc(c.name)}<button onclick="deleteCat(${c.id})" aria-label="Delete">✕</button></span>`).join("") || "<div class='empty'>No categories yet</div>";
 }
 function openPostForm(id) {
   const p = id ? posts.find(x => x.id == id) : null;
