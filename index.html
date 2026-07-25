@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0d0d0d">
+  <title>Family Lover BD</title>
+
+  <!-- ══════════════════════════════════════════════════════
+       ⚙️  CONFIG — শুধু এই অংশটি সম্পাদনা করুন
+       ══════════════════════════════════════════════════════ -->
+  <script>
+    const APP_CONFIG = {
+      // ── Supabase ──────────────────────────────────────────
+      // https://app.supabase.com → Project Settings → API
+      SUPABASE_URL:              'https://YOUR_PROJECT.supabase.co',
+      SUPABASE_ANON_KEY:         'YOUR_SUPABASE_ANON_KEY',
+
+      // ── Admin ─────────────────────────────────────────────
+      // আপনার Telegram ID (https://t.me/userinfobot থেকে পান)
+      ADMIN_TELEGRAM_ID:         0,
+
+      // ── Monetag ───────────────────────────────────────────
+      // https://monetag.com থেকে Zone ID নিন
+      MONETAG_ZONE_ID:           '',
+      MONETAG_ONCLICK_ID:        '',
+
+      // ── App Settings ──────────────────────────────────────
+      APP_NAME:                  'Family Lover BD',
+      UNLOCK_AD_COUNT:           4,        // কতটি বিজ্ঞাপন দেখলে আনলক হবে
+      ITEMS_PER_PAGE:            10,
+      AD_COUNTDOWN_SECONDS:      8,        // বিজ্ঞাপন দেখার পর কত সেকেন্ড অপেক্ষা
+    };
+  </script>
+
+  <!-- Telegram WebApp SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <!-- ══════════════════════════════════════════════════════
+       🎨  STYLES — সম্পূর্ণ CSS (ডার্ক মোড, মোবাইল-ফার্স্ট)
+       ══════════════════════════════════════════════════════ -->
+  <style>
+    /* ── Variables ── */
+    :root {
+      --bg:        #0d0d0d; --bg2: #1a1a1a; --bg3: #1e1e1e; --bg4: #252525;
+      --txt:       #f0f0f0; --txt2: #a0a0a0; --txt3: #666;
+      --accent:    #e91e8c; --accent2: #c01570; --accent3: #ff4db8;
+      --ok:        #22c55e; --warn: #f59e0b; --err: #ef4444; --info: #3b82f6;
+      --br:        #2a2a2a; --br2: #333;
+      --r:         12px; --r2: 8px; --r3: 16px;
+      --sh:        0 4px 24px rgba(0,0,0,.5);
+      --font:      'Segoe UI','Noto Sans Bengali',Arial,sans-serif;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{font-size:16px;scroll-behavior:smooth}
+    body{font-family:var(--font);background:var(--bg);color:var(--txt);min-height:100vh;
+         max-width:480px;margin:0 auto;overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+    a{color:inherit;text-decoration:none} img{max-width:100%;height:auto;display:block}
+    button{cursor:pointer;font-family:var(--font);border:none;outline:none}
+    input,textarea,select{font-family:var(--font);outline:none}
+    ::-webkit-scrollbar{width:4px} ::-webkit-scrollbar-track{background:var(--bg)}
+    ::-webkit-scrollbar-thumb{background:var(--br2);border-radius:2px}
+
+    /* ── Loading ── */
+    #loading-screen{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;
+      flex-direction:column;align-items:center;justify-content:center;gap:20px;transition:opacity .5s}
+    #loading-screen.hide{opacity:0;pointer-events:none}
+    .ld-logo{width:72px;height:72px;background:linear-gradient(135deg,var(--accent),var(--accent2));
+      border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:36px;
+      animation:logoPop .6s cubic-bezier(.34,1.56,.64,1)}
+    @keyframes logoPop{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
+    .ld-txt{font-size:18px;font-weight:700}
+    .ld-dots{display:flex;gap:6px}
+    .ld-dots span{width:8px;height:8px;background:var(--accent);border-radius:50%;
+      animation:dotB 1.2s ease infinite}
+    .ld-dots span:nth-child(2){animation-delay:.2s} .ld-dots span:nth-child(3){animation-delay:.4s}
+    @keyframes dotB{0%,80%,100%{transform:scale(.6);opacity:.4}40%{transform:scale(1);opacity:1}}
+
+    /* ── Header ── */
+    .header{position:sticky;top:0;z-index:100;background:var(--bg2);border-bottom:1px solid var(--br);
+      padding:12px 16px;display:flex;align-items:center;justify-content:space-between;
+      backdrop-filter:blur(12px)}
+    .h-logo{display:flex;align-items:center;gap:10px}
+    .h-logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--accent2));
+      border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+    .h-logo-name{font-size:15px;font-weight:700;line-height:1.2}
+    .h-logo-sub{font-size:10px;color:var(--txt3)}
+    .h-user{display:flex;align-items:center;gap:8px}
+    .h-avatar{width:34px;height:34px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:50%;
+      display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff}
+    .h-uname{font-size:13px;font-weight:600;color:var(--txt2);max-width:80px;
+      overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+    /* ── Category Bar ── */
+    .cat-bar{background:var(--bg2);padding:10px 0;border-bottom:1px solid var(--br);
+      position:sticky;top:61px;z-index:99}
+    .cat-scroll{display:flex;gap:8px;padding:0 16px;overflow-x:auto;scrollbar-width:none}
+    .cat-scroll::-webkit-scrollbar{display:none}
+    .cat-chip{display:flex;align-items:center;gap:5px;padding:6px 14px;
+      background:var(--bg3);border:1px solid var(--br);border-radius:20px;
+      font-size:13px;color:var(--txt2);white-space:nowrap;cursor:pointer;
+      transition:all .2s;flex-shrink:0}
+    .cat-chip:hover{background:var(--bg4);color:var(--txt)}
+    .cat-chip.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+
+    /* ── Feed ── */
+    .feed{padding:16px;display:flex;flex-direction:column;gap:16px}
+
+    /* ── Post Card ── */
+    .post-card{background:var(--bg3);border-radius:var(--r3);border:1px solid var(--br);
+      overflow:hidden;transition:transform .2s,box-shadow .2s;
+      animation:fadeUp .3s ease forwards}
+    .post-card:hover{transform:translateY(-2px);box-shadow:var(--sh)}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+    .post-thumb{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;background:var(--bg2)}
+    .post-thumb img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
+    .post-card:hover .post-thumb img{transform:scale(1.04)}
+    .post-thumb .no-img{width:100%;height:100%;display:flex;align-items:center;
+      justify-content:center;font-size:48px;
+      background:linear-gradient(135deg,var(--bg2),var(--bg4));color:var(--txt3)}
+    .post-cat-badge{position:absolute;top:10px;left:10px;background:rgba(0,0,0,.75);
+      backdrop-filter:blur(8px);border-radius:20px;padding:3px 10px;font-size:11px;
+      color:var(--txt2);display:flex;align-items:center;gap:4px}
+
+    .post-body{padding:14px}
+    .post-title{font-size:15px;font-weight:600;line-height:1.5;margin-bottom:12px;
+      display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .post-meta{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+    .meta-item{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--txt3)}
+    .meta-item svg{width:14px;height:14px;flex-shrink:0}
+
+    /* ── Unlock Section ── */
+    .unlock-bar{height:6px;background:var(--bg2);border-radius:3px;overflow:hidden;margin-bottom:10px}
+    .unlock-fill{height:100%;border-radius:3px;
+      background:linear-gradient(90deg,var(--accent),var(--accent3));transition:width .4s}
+    .unlock-fill.done{background:linear-gradient(90deg,var(--ok),#86efac)}
+
+    .unlock-btn{width:100%;padding:11px;border-radius:var(--r2);font-size:14px;
+      font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s}
+    .unlock-btn.locked{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+    .unlock-btn.locked:hover{opacity:.9} .unlock-btn.locked:active{transform:scale(.97)}
+    .unlock-btn.unlocked{background:transparent;border:1.5px solid var(--ok);color:var(--ok);cursor:default}
+    .unlock-badge{background:rgba(255,255,255,.2);border-radius:10px;padding:2px 8px;font-size:12px}
+    .unlock-btn.unlocked .unlock-badge{display:none}
+
+    .open-btn{width:100%;margin-top:8px;padding:11px;border-radius:var(--r2);
+      background:var(--ok);color:#fff;font-size:14px;font-weight:600;
+      display:none;align-items:center;justify-content:center;gap:8px;transition:all .2s}
+    .open-btn.show{display:flex} .open-btn:hover{background:#16a34a} .open-btn:active{transform:scale(.97)}
+
+    /* ── Skeleton ── */
+    .skel{background:var(--bg3);border-radius:var(--r3);border:1px solid var(--br);overflow:hidden}
+    .skel-t{width:100%;aspect-ratio:16/9;background:var(--bg2);position:relative;overflow:hidden}
+    .skel-b{padding:14px}
+    .skel-l{height:14px;border-radius:7px;background:var(--bg2);margin-bottom:10px;position:relative;overflow:hidden}
+    .skel-l.s{width:60%} .skel-l.m{width:80%}
+    .skel-t::after,.skel-l::after{content:'';position:absolute;inset:0;
+      background:linear-gradient(90deg,transparent,rgba(255,255,255,.05),transparent);
+      animation:shim 1.5s infinite}
+    @keyframes shim{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
+
+    .spinner-wrap{display:flex;justify-content:center;padding:20px}
+    .spinner{width:28px;height:28px;border:3px solid var(--br);border-top-color:var(--accent);
+      border-radius:50%;animation:spin .7s linear infinite}
+    .spinner.sm{width:20px;height:20px;border-width:2px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .end-msg{text-align:center;padding:20px;color:var(--txt3);font-size:13px}
+
+    /* ── Ad Modal ── */
+    .modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:1000;
+      display:flex;align-items:flex-end;justify-content:center;
+      opacity:0;pointer-events:none;transition:opacity .3s}
+    .modal-ov.on{opacity:1;pointer-events:all}
+    .ad-modal{width:100%;max-width:480px;background:var(--bg3);border-radius:var(--r3) var(--r3) 0 0;
+      padding:24px 20px 36px;transform:translateY(100%);
+      transition:transform .35s cubic-bezier(.34,1.56,.64,1);border-top:1px solid var(--br2);
+      position:relative}
+    .modal-ov.on .ad-modal{transform:translateY(0)}
+    .modal-handle{width:40px;height:4px;background:var(--br2);border-radius:2px;margin:0 auto 20px}
+    .modal-close{position:absolute;top:16px;right:16px;width:30px;height:30px;
+      background:var(--bg2);border-radius:50%;display:flex;align-items:center;
+      justify-content:center;font-size:16px;color:var(--txt2);cursor:pointer}
+    .modal-title{font-size:18px;font-weight:700;text-align:center;margin-bottom:6px}
+    .modal-sub{font-size:13px;color:var(--txt3);text-align:center;margin-bottom:24px}
+
+    .ad-steps{display:flex;justify-content:center;gap:8px;margin-bottom:24px}
+    .ad-step{width:40px;height:40px;border-radius:50%;border:2px solid var(--br2);
+      display:flex;align-items:center;justify-content:center;font-size:14px;
+      font-weight:700;color:var(--txt3);transition:all .3s}
+    .ad-step.done{background:var(--ok);border-color:var(--ok);color:#fff}
+    .ad-step.active{background:var(--accent);border-color:var(--accent);color:#fff;
+      animation:pulse 1.2s ease infinite}
+    @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+
+    .ad-cd{text-align:center;margin-bottom:20px;display:none}
+    .ad-cd-num{font-size:52px;font-weight:800;color:var(--accent);line-height:1}
+    .ad-cd-lbl{font-size:12px;color:var(--txt3);margin-top:4px}
+    .ad-cd-bar{height:4px;background:var(--br);border-radius:2px;margin-top:10px;overflow:hidden}
+    .ad-cd-fill{height:100%;background:var(--accent);border-radius:2px;transition:width 1s linear}
+
+    .ad-act-btn{width:100%;padding:14px;border-radius:var(--r);font-size:15px;font-weight:700;
+      background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;transition:all .2s}
+    .ad-act-btn:disabled{opacity:.45;cursor:not-allowed}
+    .ad-act-btn:not(:disabled):hover{opacity:.9} .ad-act-btn:not(:disabled):active{transform:scale(.98)}
+
+    /* ── Toast ── */
+    #toast-box{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:9998;
+      display:flex;flex-direction:column;gap:8px;pointer-events:none;
+      width:calc(100% - 32px);max-width:440px}
+    .toast{padding:12px 16px;border-radius:var(--r2);font-size:13px;font-weight:500;
+      display:flex;align-items:center;gap:10px;backdrop-filter:blur(12px);
+      box-shadow:0 4px 20px rgba(0,0,0,.4);animation:tIn .3s ease;pointer-events:all}
+    .toast.ok {background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:#86efac}
+    .toast.err{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#fca5a5}
+    .toast.inf{background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);color:#93c5fd}
+    .toast.wrn{background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);color:#fcd34d}
+    @keyframes tIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes tOut{from{opacity:1}to{opacity:0;transform:translateY(-10px)}}
+
+    /* ── Empty State ── */
+    .empty{text-align:center;padding:60px 20px;color:var(--txt3)}
+    .empty-ico{font-size:56px;margin-bottom:16px}
+    .empty-ttl{font-size:16px;font-weight:600;color:var(--txt2);margin-bottom:8px}
+
+    /* ══════════════════════════════════════════════════════
+       ADMIN PANEL STYLES
+       ══════════════════════════════════════════════════════ */
+    #admin-app{display:none}
+    .adm-header{background:var(--bg2);border-bottom:1px solid var(--br);
+      padding:14px 16px;display:flex;align-items:center;gap:10px;
+      position:sticky;top:0;z-index:100}
+    .adm-back{width:34px;height:34px;background:var(--bg3);border-radius:8px;
+      display:flex;align-items:center;justify-content:center;font-size:18px;
+      color:var(--txt2);cursor:pointer;border:1px solid var(--br);flex-shrink:0}
+    .adm-ttl{font-size:16px;font-weight:700;flex:1}
+    .adm-badge{font-size:10px;font-weight:700;background:var(--accent);color:#fff;
+      padding:3px 8px;border-radius:20px}
+
+    .adm-nav{background:var(--bg2);border-bottom:1px solid var(--br);
+      display:flex;overflow-x:auto;scrollbar-width:none;
+      position:sticky;top:62px;z-index:99}
+    .adm-nav::-webkit-scrollbar{display:none}
+    .adm-nav-btn{padding:10px 16px;font-size:12px;font-weight:600;color:var(--txt3);
+      background:transparent;border-bottom:2px solid transparent;
+      white-space:nowrap;flex-shrink:0;cursor:pointer;transition:all .2s}
+    .adm-nav-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+    .adm-nav-btn:hover{color:var(--txt2)}
+
+    .adm-tab{display:none;padding:16px}
+    .adm-tab.active{display:block}
+
+    .sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+    .sec-ttl{font-size:14px;font-weight:700}
+
+    .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+    .stat-card{background:var(--bg3);border:1px solid var(--br);border-radius:var(--r);padding:14px}
+    .stat-lbl{font-size:11px;color:var(--txt3);margin-bottom:6px}
+    .stat-val{font-size:22px;font-weight:800}
+    .stat-val.a{color:var(--accent)} .stat-val.g{color:var(--ok)}
+    .stat-val.b{color:var(--info)}  .stat-val.w{color:var(--warn)}
+
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;
+      border-radius:var(--r2);font-size:13px;font-weight:600;cursor:pointer;
+      border:none;transition:all .2s}
+    .btn-pr{background:var(--accent);color:#fff} .btn-pr:hover{background:var(--accent2)}
+    .btn-ok{background:var(--ok);color:#fff} .btn-ok:hover{background:#16a34a}
+    .btn-er{background:var(--err);color:#fff} .btn-er:hover{background:#dc2626}
+    .btn-gh{background:var(--bg3);color:var(--txt2);border:1px solid var(--br2)}
+    .btn-gh:hover{background:var(--bg4)}
+    .btn-sm{padding:6px 12px;font-size:12px} .btn-ic{padding:7px}
+
+    .search-bar{display:flex;align-items:center;gap:8px;background:#111;
+      border:1px solid var(--br);border-radius:var(--r2);padding:9px 12px;margin-bottom:14px}
+    .search-bar input{flex:1;background:transparent;color:var(--txt);font-size:13px;border:none}
+    .search-bar input::placeholder{color:var(--txt3)}
+
+    .adm-item{background:var(--bg3);border:1px solid var(--br);border-radius:var(--r);
+      padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+    .adm-thumb{width:52px;height:40px;border-radius:6px;background:var(--bg2);
+      object-fit:cover;flex-shrink:0;overflow:hidden;display:flex;
+      align-items:center;justify-content:center;font-size:20px}
+    .adm-thumb img{width:100%;height:100%;object-fit:cover}
+    .adm-info{flex:1;min-width:0}
+    .adm-item-ttl{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;
+      white-space:nowrap;margin-bottom:3px}
+    .adm-meta{font-size:11px;color:var(--txt3);display:flex;gap:8px;flex-wrap:wrap}
+    .adm-acts{display:flex;gap:6px;flex-shrink:0}
+
+    .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700}
+    .bg{background:rgba(34,197,94,.15);color:var(--ok)}
+    .br{background:rgba(239,68,68,.15);color:var(--err)}
+    .by{background:rgba(245,158,11,.15);color:var(--warn)}
+    .bb{background:rgba(59,130,246,.15);color:var(--info)}
+
+    /* Form Modal */
+    .fm-ov{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:500;
+      display:flex;align-items:flex-end;justify-content:center;
+      opacity:0;pointer-events:none;transition:opacity .25s}
+    .fm-ov.on{opacity:1;pointer-events:all}
+    .fm-box{width:100%;max-width:480px;background:var(--bg2);border-radius:16px 16px 0 0;
+      border-top:1px solid var(--br2);padding:20px 16px 36px;max-height:85vh;
+      overflow-y:auto;transform:translateY(100%);
+      transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
+    .fm-ov.on .fm-box{transform:translateY(0)}
+    .fm-handle{width:36px;height:4px;background:var(--br2);border-radius:2px;margin:0 auto 16px}
+    .fm-ttl{font-size:16px;font-weight:700;margin-bottom:20px}
+    .fg{margin-bottom:14px}
+    .fl{font-size:12px;color:var(--txt2);margin-bottom:6px;display:block}
+    .fi,.fs,.fta{width:100%;background:#111;border:1px solid var(--br);border-radius:var(--r2);
+      padding:10px 12px;font-size:14px;color:var(--txt);transition:border-color .2s}
+    .fi:focus,.fs:focus,.fta:focus{border-color:var(--accent)}
+    .fi::placeholder,.fta::placeholder{color:var(--txt3)}
+    .fs{appearance:none;cursor:pointer} option{background:var(--bg2)}
+    .fta{resize:vertical;min-height:80px}
+    .frow{display:flex;gap:10px} .frow .fg{flex:1}
+    .fm-acts{display:flex;gap:10px;margin-top:20px}
+    .fm-acts .btn{flex:1;justify-content:center;padding:12px}
+
+    /* Confirm */
+    .cf-ov{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:600;
+      display:flex;align-items:center;justify-content:center;padding:20px;
+      opacity:0;pointer-events:none;transition:opacity .2s}
+    .cf-ov.on{opacity:1;pointer-events:all}
+    .cf-box{width:100%;max-width:320px;background:var(--bg2);border-radius:16px;
+      border:1px solid var(--br2);padding:24px 20px;text-align:center;
+      transform:scale(.9);transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
+    .cf-ov.on .cf-box{transform:scale(1)}
+    .cf-ico{font-size:40px;margin-bottom:12px}
+    .cf-ttl{font-size:16px;font-weight:700;margin-bottom:8px}
+    .cf-msg{font-size:13px;color:var(--txt2);margin-bottom:20px;line-height:1.5}
+    .cf-acts{display:flex;gap:10px}
+    .cf-acts .btn{flex:1;justify-content:center}
+
+    /* Toggle */
+    .tgl{position:relative;width:40px;height:22px;flex-shrink:0}
+    .tgl input{opacity:0;width:0;height:0}
+    .tgl-sl{position:absolute;inset:0;cursor:pointer;background:var(--br2);border-radius:11px;transition:.2s}
+    .tgl-sl::before{content:'';position:absolute;height:16px;width:16px;left:3px;bottom:3px;
+      background:#fff;border-radius:50%;transition:.2s}
+    input:checked+.tgl-sl{background:var(--accent)}
+    input:checked+.tgl-sl::before{transform:translateX(18px)}
+
+    /* Access Denied */
+    .deny{min-height:100vh;display:flex;flex-direction:column;align-items:center;
+      justify-content:center;text-align:center;padding:40px 20px}
+    .deny-ico{font-size:64px;margin-bottom:20px}
+    .deny-ttl{font-size:22px;font-weight:800;margin-bottom:10px;color:var(--err)}
+    .deny-msg{font-size:14px;color:var(--txt3);line-height:1.6}
+
+    /* Chart */
+    .chart-card{background:var(--bg3);border:1px solid var(--br);border-radius:var(--r);
+      padding:16px;margin-bottom:14px}
+    .chart-ttl{font-size:13px;font-weight:600;margin-bottom:12px;color:var(--txt2)}
+    .bar-chart{display:flex;align-items:flex-end;gap:6px;height:80px}
+    .bar-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+    .bar-fill{width:100%;border-radius:4px 4px 0 0;
+      background:linear-gradient(180deg,var(--accent),var(--accent2));min-height:4px;transition:.5s}
+    .bar-lbl{font-size:9px;color:var(--txt3)}
+
+    /* Settings */
+    .set-item{background:var(--bg3);border:1px solid var(--br);border-radius:var(--r);
+      padding:14px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
+    .set-info{flex:1}
+    .set-lbl{font-size:13px;font-weight:600;margin-bottom:3px}
+    .set-desc{font-size:11px;color:var(--txt3)}
+    .set-ctl{flex-shrink:0;display:flex;gap:6px;align-items:center}
+  </style>
+</head>
+<body>
+
+  <!-- ══ Toast ══ -->
+  <div id="toast-box"></div>
+
+  <!-- ══ Loading Screen ══ -->
+  <div id="loading-screen">
+    <div class="ld-logo">💕</div>
+    <div class="ld-txt">Family Lover BD</div>
+    <div class="ld-dots"><span></span><span></span><span></span></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       MAIN APP
+       ══════════════════════════════════════════════════════ -->
+  <div id="main-app" style="display:none">
+    <header class="header">
+      <div class="h-logo">
+        <div class="h-logo-icon">💕</div>
+        <div>
+          <div class="h-logo-name">Family Lover BD</div>
+          <div class="h-logo-sub">বাংলাদেশের সেরা কন্টেন্ট</div>
+        </div>
+      </div>
+      <div class="h-user">
+        <div class="h-avatar" id="user-avatar">U</div>
+        <div class="h-uname" id="user-name">লোড...</div>
+      </div>
+    </header>
+
+    <nav class="cat-bar">
+      <div class="cat-scroll" id="cat-scroll"></div>
+    </nav>
+
+    <main>
+      <div class="feed" id="feed"></div>
+      <div class="spinner-wrap" id="load-spinner" style="display:none">
+        <div class="spinner"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       ADMIN APP
+       ══════════════════════════════════════════════════════ -->
+  <div id="admin-app">
+    <!-- access denied placeholder -->
+    <div id="access-denied" style="display:none" class="deny">
+      <div class="deny-ico">🚫</div>
+      <div class="deny-ttl">অ্যাক্সেস নেই</div>
+      <div class="deny-msg">এই পেজটি শুধুমাত্র অ্যাডমিনের জন্য।<br>আপনার Telegram ID অনুমোদিত নয়।</div>
+    </div>
+
+    <div id="adm-inner" style="display:none">
+      <header class="adm-header">
+        <div class="adm-back" onclick="goHome()">←</div>
+        <div class="adm-ttl">Admin Panel</div>
+        <div class="adm-badge">ADMIN</div>
+      </header>
+      <nav class="adm-nav">
+        <button class="adm-nav-btn" data-tab="dashboard"  onclick="admTab('dashboard')">📊 ড্যাশবোর্ড</button>
+        <button class="adm-nav-btn" data-tab="categories" onclick="admTab('categories')">📁 ক্যাটাগরি</button>
+        <button class="adm-nav-btn" data-tab="posts"      onclick="admTab('posts')">📝 পোস্ট</button>
+        <button class="adm-nav-btn" data-tab="users"      onclick="admTab('users')">👥 ব্যবহারকারী</button>
+        <button class="adm-nav-btn" data-tab="stats"      onclick="admTab('stats')">📈 স্ট্যাটস</button>
+        <button class="adm-nav-btn" data-tab="settings"   onclick="admTab('settings')">⚙️ সেটিংস</button>
+      </nav>
+      <div class="adm-tab" id="tab-dashboard"></div>
+      <div class="adm-tab" id="tab-categories"></div>
+      <div class="adm-tab" id="tab-posts"></div>
+      <div class="adm-tab" id="tab-users"></div>
+      <div class="adm-tab" id="tab-stats"></div>
+      <div class="adm-tab" id="tab-settings"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       ALL JAVASCRIPT (Supabase + Telegram + App + Admin)
+       ══════════════════════════════════════════════════════ -->
+  <script type="module">
+  // ── Supabase SDK (CDN) ────────────────────────────────────────────────────
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+  const C = APP_CONFIG;
+  const sb = createClient(C.SUPABASE_URL, C.SUPABASE_ANON_KEY, { auth: { persistSession: false } });
+
+  // ── Telegram ─────────────────────────────────────────────────────────────
+  const tg = window.Telegram?.WebApp;
+  function tgInit(){ if(tg){tg.ready();tg.expand();tg.setHeaderColor('#0d0d0d');tg.setBackgroundColor('#0d0d0d')} }
+  function tgUser(){
+    if(tg?.initDataUnsafe?.user){
+      const u=tg.initDataUnsafe.user;
+      return{id:u.id,username:u.username||null,firstName:u.first_name||'User'};
+    }
+    return{id:null,username:'testuser',firstName:'Test User'};
+  }
+  function tgOpen(url){ if(tg) tg.openLink(url); else window.open(url,'_blank'); }
+  function tgHaptic(t='light'){
+    if(!tg?.HapticFeedback) return;
+    if(['error','success','warning'].includes(t)) tg.HapticFeedback.notificationOccurred(t);
+    else tg.HapticFeedback.impactOccurred(t);
+  }
+
+  // ── Toast ─────────────────────────────────────────────────────────────────
+  const ICONS={ok:'✅',err:'❌',inf:'ℹ️',wrn:'⚠️'};
+  function toast(msg,type='inf',dur=3000){
+    const box=document.getElementById('toast-box');
+    const el=document.createElement('div');
+    el.className=`toast ${type}`;
+    el.innerHTML=`<span>${ICONS[type]||'ℹ️'}</span><span>${msg}</span>`;
+    box.appendChild(el);
+    setTimeout(()=>{el.style.animation='tOut .3s ease forwards';setTimeout(()=>el.remove(),300)},dur);
+  }
+
+  // ── HTML escape ───────────────────────────────────────────────────────────
+  function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+  function fmtN(n){n=Number(n)||0;if(n>=1e6)return(n/1e6).toFixed(1)+'M';if(n>=1e3)return(n/1e3).toFixed(1)+'K';return String(n)}
+
+  // ════════════════════════════════════════════════════════
+  // ROUTING
+  // ════════════════════════════════════════════════════════
+  const isAdmin = window.location.pathname.includes('/admin') || window.location.hash==='#admin';
+
+  // ════════════════════════════════════════════════════════
+  // SUPABASE HELPERS
+  // ════════════════════════════════════════════════════════
+  async function upsertUser(id,username,firstName){
+    const{data,error}=await sb.from('users').upsert({telegram_id:id,username,first_name:firstName,last_seen:new Date().toISOString()},{onConflict:'telegram_id'}).select().single();
+    if(error)throw error; return data;
+  }
+  async function getCategories(enabledOnly=true){
+    let q=sb.from('categories').select('*').order('sort_order');
+    if(enabledOnly)q=q.eq('is_enabled',true);
+    const{data,error}=await q; if(error)throw error; return data||[];
+  }
+  async function getPosts({catId=null,page=0,limit=C.ITEMS_PER_PAGE}={}){
+    let q=sb.from('posts').select('id,title,thumbnail,target_url,is_enabled,views,downloads,created_at,categories(id,name,icon)').eq('is_enabled',true).order('created_at',{ascending:false}).range(page*limit,(page+1)*limit-1);
+    if(catId)q=q.eq('category_id',catId);
+    const{data,error}=await q; if(error)throw error; return data||[];
+  }
+  async function getAllPosts({search='',catId='',page=0,limit=20}={}){
+    let q=sb.from('posts').select('id,title,thumbnail,target_url,category_id,is_enabled,views,downloads,created_at,categories(id,name,icon)').order('created_at',{ascending:false}).range(page*limit,(page+1)*limit-1);
+    if(search)q=q.ilike('title',`%${search}%`);
+    if(catId)q=q.eq('category_id',catId);
+    const{data,error}=await q; if(error)throw error; return data||[];
+  }
+  async function incView(id){
+    const{data}=await sb.from('posts').select('views').eq('id',id).single();
+    if(data) await sb.from('posts').update({views:(data.views||0)+1}).eq('id',id);
+  }
+  async function incDl(id){
+    const{data}=await sb.from('posts').select('downloads').eq('id',id).single();
+    if(data) await sb.from('posts').update({downloads:(data.downloads||0)+1}).eq('id',id);
+  }
+  async function getProgress(telegramId,postId){
+    const{data,error}=await sb.from('ad_watches').select('*').eq('user_telegram_id',telegramId).eq('post_id',postId).single();
+    if(error&&error.code!=='PGRST116')throw error; return data;
+  }
+  async function getBulkProgress(telegramId,postIds){
+    if(!postIds.length)return[];
+    const{data,error}=await sb.from('ad_watches').select('*').eq('user_telegram_id',telegramId).in('post_id',postIds);
+    if(error)throw error; return data||[];
+  }
+  async function updateProgress(telegramId,postId,count,required){
+    const unlocked=count>=required;
+    const{data,error}=await sb.from('ad_watches').upsert({user_telegram_id:telegramId,post_id:postId,watch_count:count,is_unlocked:unlocked,unlocked_at:unlocked?new Date().toISOString():null},{onConflict:'user_telegram_id,post_id'}).select().single();
+    if(error)throw error; return data;
+  }
+  async function getSettings(){
+    const{data,error}=await sb.from('settings').select('key,value'); if(error)throw error;
+    const m={}; (data||[]).forEach(s=>m[s.key]=s.value); return m;
+  }
+  async function updSetting(key,value){
+    const{error}=await sb.from('settings').upsert({key,value,updated_at:new Date().toISOString()});
+    if(error)throw error;
+  }
+  async function getAdminStats(){
+    const[posts,cats,users,unlocks]= await Promise.all([
+      sb.from('posts').select('id,views,downloads'),
+      sb.from('categories').select('id',{count:'exact',head:true}),
+      sb.from('users').select('id',{count:'exact',head:true}),
+      sb.from('ad_watches').select('id',{count:'exact',head:true}).eq('is_unlocked',true),
+    ]);
+    const totalViews=(posts.data||[]).reduce((s,p)=>s+(p.views||0),0);
+    const totalDl=(posts.data||[]).reduce((s,p)=>s+(p.downloads||0),0);
+    return{posts:(posts.data||[]).length,categories:cats.count||0,users:users.count||0,unlocks:unlocks.count||0,totalViews,totalDownloads:totalDl};
+  }
+  async function createCat(d){const{data,e}=await sb.from('categories').insert(d).select().single();if(e)throw e;return data}
+  async function updateCat(id,d){const{data,error}=await sb.from('categories').update(d).eq('id',id).select().single();if(error)throw error;return data}
+  async function deleteCat(id,moveTo=null){if(moveTo)await sb.from('posts').update({category_id:moveTo}).eq('category_id',id);const{error}=await sb.from('categories').delete().eq('id',id);if(error)throw error}
+  async function createPost(d){const{data,error}=await sb.from('posts').insert(d).select().single();if(error)throw error;return data}
+  async function updatePost(id,d){const{data,error}=await sb.from('posts').update(d).eq('id',id).select().single();if(error)throw error;return data}
+  async function deletePost(id){const{error}=await sb.from('posts').delete().eq('id',id);if(error)throw error}
+  async function resetStat(id,field){const upd={};upd[field]=0;const{error}=await sb.from('posts').update(upd).eq('id',id);if(error)throw error}
+  async function getUsers({search='',page=0}={}){
+    let q=sb.from('users').select('*').order('created_at',{ascending:false}).range(page*20,(page+1)*20-1);
+    if(search)q=q.or(`first_name.ilike.%${search}%,username.ilike.%${search}%`);
+    const{data,error}=await q; if(error)throw error; return data||[];
+  }
+  async function banUser(id,reason=''){const{error}=await sb.from('users').update({is_banned:true,ban_reason:reason}).eq('telegram_id',id);if(error)throw error}
+  async function unbanUser(id){const{error}=await sb.from('users').update({is_banned:false,ban_reason:null}).eq('telegram_id',id);if(error)throw error}
+  async function resetProgress(id){const{error}=await sb.from('ad_watches').delete().eq('user_telegram_id',id);if(error)throw error}
+  async function getDailyStats(days=7){
+    const from=new Date();from.setDate(from.getDate()-days);
+    const{data,error}=await sb.from('downloads').select('downloaded_at').gte('downloaded_at',from.toISOString());
+    if(error)throw error;return data||[];
+  }
+
+  // ════════════════════════════════════════════════════════
+  // AD UNLOCK MODAL
+  // ════════════════════════════════════════════════════════
+  let adBusy=false;
+  async function openAdModal({postId,telegramId,required,onProgress,onUnlocked}){
+    if(adBusy)return; adBusy=true;
+    let prog=await getProgress(telegramId,postId);
+    let count=prog?.watch_count||0;
+    if(prog?.is_unlocked){adBusy=false;onUnlocked?.();return;}
+
+    const ov=document.createElement('div');
+    ov.className='modal-ov'; ov.id='ad-modal-ov';
+    ov.innerHTML=`<div class="ad-modal">
+      <div class="modal-handle"></div>
+      <button class="modal-close" id="am-close">✕</button>
+      <div class="modal-title">🔓 লিংক আনলক করুন</div>
+      <div class="modal-sub">বিজ্ঞাপন দেখে বিনামূল্যে আনলক করুন</div>
+      <div class="ad-steps" id="am-steps"></div>
+      <div class="ad-cd" id="am-cd">
+        <div class="ad-cd-num" id="am-num">8</div>
+        <div class="ad-cd-lbl">সেকেন্ড অপেক্ষা করুন...</div>
+        <div class="ad-cd-bar"><div class="ad-cd-fill" id="am-fill" style="width:100%"></div></div>
+      </div>
+      <button class="ad-act-btn" id="am-btn" disabled>লোড হচ্ছে...</button>
+    </div>`;
+    document.body.appendChild(ov);
+    requestAnimationFrame(()=>ov.classList.add('on'));
+
+    const stepsEl=document.getElementById('am-steps');
+    const btn=document.getElementById('am-btn');
+    const cdEl=document.getElementById('am-cd');
+    const numEl=document.getElementById('am-num');
+    const fillEl=document.getElementById('am-fill');
+    const closeBtn=document.getElementById('am-close');
+
+    function renderSteps(){
+      let h='';
+      for(let i=0;i<required;i++){
+        let c=i<count?'done':i===count?'active':'';
+        h+=`<div class="ad-step ${c}">${i<count?'✓':i+1}</div>`;
+      }
+      stepsEl.innerHTML=h;
+    }
+    function setBtn(){
+      if(count>=required){btn.textContent='🎉 সম্পন্ন!';btn.disabled=true;return;}
+      btn.textContent=`বিজ্ঞাপন দেখুন (${count+1}/${required})`;
+      btn.disabled=false;
+    }
+    renderSteps(); setBtn();
+
+    function closeModal(){ov.classList.remove('on');setTimeout(()=>{ov.remove();adBusy=false;},350);}
+    closeBtn.addEventListener('click',closeModal);
+    ov.addEventListener('click',e=>{if(e.target===ov)closeModal();});
+
+    btn.addEventListener('click',async()=>{
+      btn.disabled=true; btn.textContent='বিজ্ঞাপন খুলছে...';
+      triggerMonetag();
+      // Countdown
+      let secs=C.AD_COUNTDOWN_SECONDS;
+      cdEl.style.display='block';
+      numEl.textContent=secs;
+      fillEl.style.width='100%';
+      const timer=setInterval(async()=>{
+        secs--;
+        numEl.textContent=secs;
+        fillEl.style.width=`${(secs/C.AD_COUNTDOWN_SECONDS)*100}%`;
+        if(secs<=0){
+          clearInterval(timer);
+          cdEl.style.display='none';
+          // Save progress
+          try{
+            count++;
+            const nowUnlocked=count>=required;
+            await updateProgress(telegramId,postId,count,required);
+            onProgress?.(count);
+            renderSteps();
+            if(nowUnlocked){
+              btn.textContent='🎉 সম্পন্ন!';
+              btn.style.background='linear-gradient(135deg,var(--ok),#16a34a)';
+              toast('🎉 লিংক আনলক হয়েছে!','ok');
+              setTimeout(()=>{closeModal();onUnlocked?.();},1500);
+            } else {
+              toast(`✅ ${count}/${required} — আরো ${required-count}টি বিজ্ঞাপন দেখুন`,'inf');
+              setBtn();
+            }
+          }catch(err){toast('সংরক্ষণ সমস্যা','err');setBtn();}
+        }
+      },1000);
+    });
+  }
+
+  function triggerMonetag(){
+    const zoneId=C.MONETAG_ZONE_ID;
+    const onclickId=C.MONETAG_ONCLICK_ID;
+    if(zoneId){
+      try{if(window.show_9089325){window.show_9089325(zoneId);return;}}catch(e){}
+      try{if(window.monetag){window.monetag.showAd(zoneId);return;}}catch(e){}
+    }
+    if(onclickId){
+      try{
+        const s=document.createElement('script');
+        s.src=`https://golumio.com/act/files/tag.min.js?z=${onclickId}`;
+        document.head.appendChild(s);
+        setTimeout(()=>s.remove(),5000);
+      }catch(e){}
+    }
+  }
+
+  // ════════════════════════════════════════════════════════
+  // MAIN APP
+  // ════════════════════════════════════════════════════════
+  let currentUser=null, currentCat=null, page=0, loading=false, hasMore=true;
+  let settings={};
+
+  async function initMain(){
+    tgInit();
+    const u=tgUser();
+    if(u?.id){
+      try{
+        currentUser=await upsertUser(u.id,u.username,u.firstName);
+        if(currentUser?.is_banned){showBanned();return;}
+      }catch(e){console.warn('User save error',e);}
+    }
+    document.getElementById('user-avatar').textContent=(u.firstName||'U')[0].toUpperCase();
+    document.getElementById('user-name').textContent=u.firstName;
+
+    try{settings=await getSettings();}catch(e){}
+
+    await renderCats();
+    await loadPosts(true);
+
+    // Update config from DB settings if available
+    if(settings.unlock_ad_count) C.UNLOCK_AD_COUNT=parseInt(settings.unlock_ad_count)||4;
+    if(settings.monetag_zone_id) C.MONETAG_ZONE_ID=settings.monetag_zone_id;
+    if(settings.monetag_onclick_id) C.MONETAG_ONCLICK_ID=settings.monetag_onclick_id;
+
+    document.getElementById('main-app').style.display='block';
+    setTimeout(()=>document.getElementById('loading-screen').classList.add('hide'),600);
+    window.addEventListener('scroll',onScroll);
+  }
+
+  function showBanned(){
+    document.getElementById('main-app').style.display='block';
+    document.getElementById('feed').innerHTML=`<div class="empty"><div class="empty-ico">🚫</div><div class="empty-ttl">অ্যাক্সেস নিষিদ্ধ</div><div>আপনার অ্যাকাউন্ট নিষিদ্ধ করা হয়েছে।</div></div>`;
+    setTimeout(()=>document.getElementById('loading-screen').classList.add('hide'),600);
+  }
+
+  async function renderCats(){
+    const cats=await getCategories().catch(()=>[]);
+    let h=`<div class="cat-chip active" onclick="filterCat(this,'')"><span>🏠</span> সব</div>`;
+    cats.forEach(c=>{h+=`<div class="cat-chip" onclick="filterCat(this,'${c.id}')"><span>${c.icon||'📁'}</span> ${esc(c.name)}</div>`;});
+    document.getElementById('cat-scroll').innerHTML=h;
+  }
+
+  window.filterCat=function(el,id){
+    document.querySelectorAll('.cat-chip').forEach(c=>c.classList.remove('active'));
+    el.classList.add('active');
+    currentCat=id||null; page=0; hasMore=true;
+    document.getElementById('feed').innerHTML='';
+    loadPosts(true);
+  };
+
+  async function loadPosts(reset=false){
+    if(loading||!hasMore)return; loading=true;
+    const feed=document.getElementById('feed');
+    const spinner=document.getElementById('load-spinner');
+    if(reset){page=0;hasMore=true;feed.innerHTML=skelHtml(4);}
+    else spinner.style.display='flex';
+
+    try{
+      const required=C.UNLOCK_AD_COUNT;
+      const posts=await getPosts({catId:currentCat,page,limit:C.ITEMS_PER_PAGE});
+      if(posts.length<C.ITEMS_PER_PAGE)hasMore=false;
+      if(!posts.length&&page===0){
+        feed.innerHTML=`<div class="empty"><div class="empty-ico">📭</div><div class="empty-ttl">কোনো পোস্ট নেই</div></div>`;
+        return;
+      }
+      if(reset)feed.innerHTML='';
+
+      let progressMap={};
+      if(currentUser?.telegram_id&&posts.length){
+        const progs=await getBulkProgress(currentUser.telegram_id,posts.map(p=>p.id));
+        progs.forEach(p=>progressMap[p.post_id]=p);
+      }
+
+      posts.forEach((post,i)=>{
+        const pg=progressMap[post.id];
+        const wc=pg?.watch_count||0;
+        const unlocked=pg?.is_unlocked||false;
+        const card=makeCard(post,wc,unlocked,required);
+        card.style.animationDelay=`${(reset?i:0)*60}ms`;
+        feed.appendChild(card);
+        incView(post.id).catch(()=>{});
+      });
+      page++;
+    }catch(err){
+      console.error(err);
+      if(reset)feed.innerHTML='';
+      toast('পোস্ট লোড সমস্যা','err');
+    }finally{
+      loading=false;
+      spinner.style.display='none';
+      if(!hasMore&&page>1){
+        const e=document.createElement('div');
+        e.className='end-msg';e.textContent='— সব পোস্ট দেখা হয়েছে —';
+        document.getElementById('feed').appendChild(e);
+      }
+    }
+  }
+
+  function makeCard(post,wc,unlocked,required){
+    const card=document.createElement('div');
+    card.className='post-card';
+    card.dataset.postId=post.id;
+    const pct=unlocked?100:Math.round((wc/required)*100);
+    const cat=post.categories;
+    card.innerHTML=`
+      <div class="post-thumb">
+        ${post.thumbnail
+          ?`<img src="${esc(post.thumbnail)}" alt="${esc(post.title)}" loading="lazy" onerror="this.parentNode.innerHTML='<div class=\\"no-img\\">🎬</div>'">`
+          :'<div class="no-img">🎬</div>'}
+        ${cat?`<div class="post-cat-badge">${cat.icon||'📁'} ${esc(cat.name)}</div>`:''}
+      </div>
+      <div class="post-body">
+        <div class="post-title">${esc(post.title)}</div>
+        <div class="post-meta">
+          <span class="meta-item">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+            ${fmtN(post.views||0)}
+          </span>
+          <span class="meta-item">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            ${fmtN(post.downloads||0)}
+          </span>
+        </div>
+        <div class="unlock-bar"><div class="unlock-fill${unlocked?' done':''}" style="width:${pct}%"></div></div>
+        <button class="unlock-btn ${unlocked?'unlocked':'locked'}" onclick="_unlock('${post.id}',${unlocked})" data-pid="${post.id}">
+          ${unlocked
+            ?`<span>✅</span> আনলক হয়েছে`
+            :`<span>🔓</span> আনলক করুন <span class="unlock-badge">${wc}/${required}</span>`}
+        </button>
+        <button class="open-btn${unlocked?' show':''}" onclick="_open('${post.id}','${esc(post.target_url)}')" data-pid="${post.id}">
+          <span>🔗</span> লিংক খুলুন
+        </button>
+      </div>`;
+    return card;
+  }
+
+  window._unlock=async function(postId,unlocked){
+    if(unlocked)return;
+    if(!currentUser?.telegram_id){toast('Telegram-এ খুলুন','wrn');return;}
+    tgHaptic('medium');
+    await openAdModal({
+      postId, telegramId:currentUser.telegram_id, required:C.UNLOCK_AD_COUNT,
+      onProgress:(c)=>updCardProgress(postId,c,C.UNLOCK_AD_COUNT),
+      onUnlocked:()=>markUnlocked(postId),
+    });
+  };
+
+  window._open=async function(postId,url){
+    tgHaptic('light'); tgOpen(url);
+    if(currentUser?.telegram_id){
+      await incDl(postId).catch(()=>{});
+      await sb.from('downloads').insert({user_telegram_id:currentUser.telegram_id,post_id:postId}).catch(()=>{});
+    }
+  };
+
+  function updCardProgress(postId,count,required){
+    const btn=document.querySelector(`.unlock-btn[data-pid="${postId}"]`);
+    const bar=document.querySelector(`.post-card[data-post-id="${postId}"] .unlock-fill`);
+    if(btn){const b=btn.querySelector('.unlock-badge');if(b)b.textContent=`${count}/${required}`;}
+    if(bar)bar.style.width=`${Math.round((count/required)*100)}%`;
+  }
+
+  function markUnlocked(postId){
+    const card=document.querySelector(`.post-card[data-post-id="${postId}"]`);
+    if(!card)return;
+    const btn=card.querySelector('.unlock-btn');
+    const open=card.querySelector('.open-btn');
+    const bar=card.querySelector('.unlock-fill');
+    if(btn){btn.classList.remove('locked');btn.classList.add('unlocked');btn.innerHTML='<span>✅</span> আনলক হয়েছে';}
+    if(bar){bar.style.width='100%';bar.classList.add('done');}
+    if(open)open.classList.add('show');
+    tgHaptic('success');
+  }
+
+  function onScroll(){
+    if(document.documentElement.scrollHeight-window.innerHeight-window.scrollY<300&&!loading&&hasMore)loadPosts();
+  }
+
+  function skelHtml(n){
+    let h='';
+    for(let i=0;i<n;i++)h+=`<div class="skel"><div class="skel-t"></div><div class="skel-b"><div class="skel-l m"></div><div class="skel-l s"></div></div></div>`;
+    return h;
+  }
+
+  window.goHome=function(){window.location.href='/';}
+
+  // ════════════════════════════════════════════════════════
+  // ADMIN PANEL
+  // ════════════════════════════════════════════════════════
+  let admSettings={};
+  let admAllCats=[]; let admAllPosts=[]; let admAllUsers=[];
+  let postSearch=''; let postCatFilter=''; let postPage=0;
+
+  async function initAdmin(){
+    tgInit();
+    const u=tgUser();
+    // Check admin ID from config first, then from DB settings
+    let adminId=C.ADMIN_TELEGRAM_ID;
+    try{admSettings=await getSettings();if(admSettings.admin_telegram_id)adminId=parseInt(admSettings.admin_telegram_id)||0;}catch(e){}
+
+    const allowed=u?.id&&u.id===adminId;
+    document.getElementById('adm-inner').style.display=allowed?'block':'none';
+    document.getElementById('access-denied').style.display=allowed?'none':'flex';
+    document.getElementById('loading-screen').classList.add('hide');
+
+    if(!allowed)return;
+    admTab('dashboard');
+  }
+
+  window.admTab=function(tab){
+    document.querySelectorAll('.adm-nav-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.adm-tab').forEach(t=>t.classList.remove('active'));
+    const btn=document.querySelector(`[data-tab="${tab}"]`);
+    if(btn)btn.classList.add('active');
+    const el=document.getElementById(`tab-${tab}`);
+    if(el)el.classList.add('active');
+    switch(tab){
+      case'dashboard': loadDash();break;
+      case'categories':loadCats();break;
+      case'posts':      loadAdmPosts();break;
+      case'users':      loadAdmUsers();break;
+      case'stats':      loadAdmStats();break;
+      case'settings':   loadAdmSettings();break;
+    }
+  };
+
+  // ── Dashboard ────────────────────────────────────────────
+  async function loadDash(){
+    const el=document.getElementById('tab-dashboard');
+    el.innerHTML=`<div class="spinner-wrap"><div class="spinner"></div></div>`;
+    try{
+      const s=await getAdminStats();
+      el.innerHTML=`<div class="stats-grid">
+        <div class="stat-card"><div class="stat-lbl">মোট পোস্ট</div><div class="stat-val a">${s.posts}</div></div>
+        <div class="stat-card"><div class="stat-lbl">ক্যাটাগরি</div><div class="stat-val b">${s.categories}</div></div>
+        <div class="stat-card"><div class="stat-lbl">ব্যবহারকারী</div><div class="stat-val">${s.users}</div></div>
+        <div class="stat-card"><div class="stat-lbl">আনলক হয়েছে</div><div class="stat-val g">${s.unlocks}</div></div>
+        <div class="stat-card"><div class="stat-lbl">মোট ভিউ</div><div class="stat-val w">${fmtN(s.totalViews)}</div></div>
+        <div class="stat-card"><div class="stat-lbl">মোট ডাউনলোড</div><div class="stat-val b">${fmtN(s.totalDownloads)}</div></div>
+      </div>`;
+    }catch(e){el.innerHTML=errState();}
+  }
+
+  // ── Categories ───────────────────────────────────────────
+  async function loadCats(){
+    const el=document.getElementById('tab-categories');
+    el.innerHTML=`<div class="sec-hdr"><span class="sec-ttl">ক্যাটাগরি</span><button class="btn btn-pr btn-sm" onclick="openCatForm()">+ নতুন</button></div><div id="cat-list"><div class="spinner-wrap"><div class="spinner"></div></div></div>`;
+    admAllCats=await getCategories(false).catch(()=>[]);
+    renderCatList();
+  }
+
+  function renderCatList(){
+    const el=document.getElementById('cat-list');
+    if(!admAllCats.length){el.innerHTML=emptyState('📁','কোনো ক্যাটাগরি নেই');return;}
+    el.innerHTML=admAllCats.map(c=>`
+      <div class="adm-item">
+        <div class="adm-thumb">${c.icon||'📁'}</div>
+        <div class="adm-info">
+          <div class="adm-item-ttl">${esc(c.name)}</div>
+          <div class="adm-meta"><span>ক্রম: ${c.sort_order}</span><span class="badge ${c.is_enabled?'bg':'br'}">${c.is_enabled?'সক্রিয়':'বন্ধ'}</span></div>
+        </div>
+        <div class="adm-acts">
+          <button class="btn btn-gh btn-sm btn-ic" onclick="openCatForm('${c.id}')">✏️</button>
+          <button class="btn btn-er btn-sm btn-ic" onclick="cfmDelCat('${c.id}')">🗑️</button>
+        </div>
+      </div>`).join('');
+  }
+
+  window.openCatForm=function(id=null){
+    const c=id?admAllCats.find(x=>x.id===id):null;
+    openFM(id?'ক্যাটাগরি সম্পাদনা':'নতুন ক্যাটাগরি',`
+      <div class="fg"><label class="fl">নাম</label><input class="fi" id="cf-name" placeholder="ক্যাটাগরির নাম" value="${esc(c?.name||'')}"></div>
+      <div class="frow">
+        <div class="fg"><label class="fl">আইকন</label><input class="fi" id="cf-icon" placeholder="📁" value="${esc(c?.icon||'📁')}" maxlength="4"></div>
+        <div class="fg"><label class="fl">ক্রম</label><input class="fi" id="cf-order" type="number" value="${c?.sort_order||0}"></div>
+      </div>
+      <div class="fg" style="display:flex;align-items:center;justify-content:space-between">
+        <label class="fl" style="margin:0">সক্রিয়</label>
+        <label class="tgl"><input type="checkbox" id="cf-en" ${c?.is_enabled!==false?'checked':''}><span class="tgl-sl"></span></label>
+      </div>`,
+      async()=>{
+        const name=document.getElementById('cf-name').value.trim();
+        if(!name){toast('নাম দিন','err');return;}
+        try{
+          const data={name,icon:document.getElementById('cf-icon').value.trim()||'📁',sort_order:parseInt(document.getElementById('cf-order').value)||0,is_enabled:document.getElementById('cf-en').checked};
+          if(id)await updateCat(id,data);else await createCat(data);
+          closeFM(); toast(id?'আপডেট হয়েছে':'যোগ করা হয়েছে','ok'); loadCats();
+        }catch(e){toast('সমস্যা হয়েছে','err');}
+      }
+    );
+  };
+
+  window.cfmDelCat=function(id){
+    const c=admAllCats.find(x=>x.id===id);
+    openCF(`"${c?.name}" মুছবেন?`,'সব পোস্ট আনক্যাটাগরাইজড হবে।','🗑️',async()=>{
+      try{await deleteCat(id);toast('মুছা হয়েছে','ok');loadCats();}catch(e){toast('সমস্যা','err');}
+    });
+  };
+
+  // ── Posts ────────────────────────────────────────────────
+  async function loadAdmPosts(){
+    const cats=await getCategories(false).catch(()=>[]);
+    const el=document.getElementById('tab-posts');
+    el.innerHTML=`
+      <div class="sec-hdr"><span class="sec-ttl">পোস্ট</span><button class="btn btn-pr btn-sm" onclick="openPostForm()">+ নতুন</button></div>
+      <div class="search-bar"><span>🔍</span><input id="ps-search" placeholder="শিরোনাম খুঁজুন..." oninput="onPSearch(this.value)"></div>
+      <select class="fi" style="margin-bottom:12px;font-size:13px" onchange="onPCat(this.value)">
+        <option value="">সব ক্যাটাগরি</option>
+        ${cats.map(c=>`<option value="${c.id}">${c.icon} ${esc(c.name)}</option>`).join('')}
+      </select>
+      <div id="post-list"></div>`;
+    postPage=0; postSearch=''; postCatFilter='';
+    await fetchAdmPosts(true);
+  }
+
+  async function fetchAdmPosts(reset=false){
+    if(reset)postPage=0;
+    const list=document.getElementById('post-list');
+    if(reset)list.innerHTML=`<div class="spinner-wrap"><div class="spinner"></div></div>`;
+    const posts=await getAllPosts({search:postSearch,catId:postCatFilter,page:postPage,limit:20}).catch(()=>[]);
+    if(reset)admAllPosts=posts; else admAllPosts=[...admAllPosts,...posts];
+    if(!admAllPosts.length){list.innerHTML=emptyState('📭','কোনো পোস্ট নেই');return;}
+    list.innerHTML=admAllPosts.map(p=>`
+      <div class="adm-item">
+        <div class="adm-thumb">${p.thumbnail?`<img src="${esc(p.thumbnail)}" alt="">`:' 🎬'}</div>
+        <div class="adm-info">
+          <div class="adm-item-ttl">${esc(p.title)}</div>
+          <div class="adm-meta"><span>👁️${fmtN(p.views)}</span><span>⬇️${fmtN(p.downloads)}</span><span class="badge ${p.is_enabled?'bg':'br'}">${p.is_enabled?'সক্রিয়':'বন্ধ'}</span></div>
+        </div>
+        <div class="adm-acts">
+          <button class="btn btn-gh btn-sm btn-ic" onclick="openPostForm('${p.id}')">✏️</button>
+          <button class="btn btn-er btn-sm btn-ic" onclick="cfmDelPost('${p.id}')">🗑️</button>
+        </div>
+      </div>`).join('') + (posts.length===20?`<button class="btn btn-gh" style="width:100%;justify-content:center;margin-top:8px" onclick="morePosts()">আরো লোড করুন</button>`:'');
+  }
+
+  window.onPSearch=v=>{postSearch=v;postPage=0;fetchAdmPosts(true);};
+  window.onPCat=v=>{postCatFilter=v;postPage=0;fetchAdmPosts(true);};
+  window.morePosts=()=>{postPage++;fetchAdmPosts(false);};
+
+  window.openPostForm=async function(id=null){
+    const p=id?admAllPosts.find(x=>x.id===id):null;
+    const cats=await getCategories(false).catch(()=>[]);
+    const catOpts=cats.map(c=>`<option value="${c.id}"${p?.category_id===c.id?' selected':''}>${c.icon} ${esc(c.name)}</option>`).join('');
+    openFM(id?'পোস্ট সম্পাদনা':'নতুন পোস্ট',`
+      <div class="fg"><label class="fl">শিরোনাম</label><input class="fi" id="pf-t" placeholder="পোস্টের শিরোনাম" value="${esc(p?.title||'')}"></div>
+      <div class="fg"><label class="fl">থাম্বনেইল URL</label><input class="fi" id="pf-th" placeholder="https://..." value="${esc(p?.thumbnail||'')}"></div>
+      <div class="fg"><label class="fl">টার্গেট URL</label><input class="fi" id="pf-u" placeholder="https://..." value="${esc(p?.target_url||'')}"></div>
+      <div class="fg"><label class="fl">ক্যাটাগরি</label><select class="fi" id="pf-c"><option value="">বিভাগ নেই</option>${catOpts}</select></div>
+      <div class="fg" style="display:flex;align-items:center;justify-content:space-between">
+        <label class="fl" style="margin:0">সক্রিয়</label>
+        <label class="tgl"><input type="checkbox" id="pf-en" ${p?.is_enabled!==false?'checked':''}><span class="tgl-sl"></span></label>
+      </div>
+      ${id?`<div style="display:flex;gap:8px;margin-top:4px">
+        <button class="btn btn-gh btn-sm" style="flex:1" onclick="doResetStat('${id}','views')">ভিউ রিসেট</button>
+        <button class="btn btn-gh btn-sm" style="flex:1" onclick="doResetStat('${id}','downloads')">ডাউনলোড রিসেট</button>
+      </div>`:''}`,
+      async()=>{
+        const title=document.getElementById('pf-t').value.trim();
+        const url=document.getElementById('pf-u').value.trim();
+        if(!title||!url){toast('শিরোনাম ও URL দিন','err');return;}
+        try{
+          const data={title,thumbnail:document.getElementById('pf-th').value.trim()||null,target_url:url,category_id:document.getElementById('pf-c').value||null,is_enabled:document.getElementById('pf-en').checked};
+          if(id)await updatePost(id,data);else await createPost(data);
+          closeFM();toast(id?'আপডেট হয়েছে':'পোস্ট যোগ হয়েছে','ok');fetchAdmPosts(true);
+        }catch(e){toast('সমস্যা হয়েছে','err');}
+      }
+    );
+  };
+
+  window.doResetStat=async function(id,field){
+    try{await resetStat(id,field);toast('রিসেট হয়েছে','ok');fetchAdmPosts(true);}
+    catch(e){toast('সমস্যা','err');}
+  };
+
+  window.cfmDelPost=function(id){
+    const p=admAllPosts.find(x=>x.id===id);
+    openCF(`"${p?.title}" মুছবেন?`,'এটি স্থায়ীভাবে মুছে যাবে।','🗑️',async()=>{
+      try{await deletePost(id);toast('মুছা হয়েছে','ok');fetchAdmPosts(true);}catch(e){toast('সমস্যা','err');}
+    });
+  };
+
+  // ── Users ────────────────────────────────────────────────
+  async function loadAdmUsers(){
+    const el=document.getElementById('tab-users');
+    el.innerHTML=`<div class="sec-hdr"><span class="sec-ttl">ব্যবহারকারী</span></div>
+      <div class="search-bar"><span>🔍</span><input id="us-search" placeholder="নাম বা ইউজারনেম..." oninput="onUsrSearch(this.value)"></div>
+      <div id="usr-list"><div class="spinner-wrap"><div class="spinner"></div></div></div>`;
+    admAllUsers=await getUsers().catch(()=>[]);
+    renderUsrList();
+  }
+
+  function renderUsrList(){
+    const el=document.getElementById('usr-list');
+    if(!admAllUsers.length){el.innerHTML=emptyState('👥','কোনো ব্যবহারকারী নেই');return;}
+    el.innerHTML=admAllUsers.map(u=>`
+      <div class="adm-item">
+        <div class="adm-thumb" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff">${(u.first_name||'U')[0].toUpperCase()}</div>
+        <div class="adm-info">
+          <div class="adm-item-ttl">${esc(u.first_name||'User')}${u.username?` (@${esc(u.username)})`:''} ${u.is_banned?'<span class="badge br">নিষিদ্ধ</span>':''}</div>
+          <div class="adm-meta">ID: ${u.telegram_id} · ${new Date(u.created_at).toLocaleDateString('bn-BD')}</div>
+        </div>
+        <div class="adm-acts">
+          ${u.is_banned
+            ?`<button class="btn btn-ok btn-sm" onclick="doUnban(${u.telegram_id})">আনব্যান</button>`
+            :`<button class="btn btn-er btn-sm" onclick="doBan(${u.telegram_id})">ব্যান</button>`}
+          <button class="btn btn-gh btn-sm btn-ic" onclick="doResetProg(${u.telegram_id})" title="প্রগ্রেস রিসেট">🔄</button>
+        </div>
+      </div>`).join('');
+  }
+
+  window.onUsrSearch=async v=>{admAllUsers=await getUsers({search:v}).catch(()=>[]);renderUsrList();};
+  window.doBan=id=>openCF('ব্যান করবেন?',`ID: ${id}`,'🚫',async()=>{try{await banUser(id);toast('ব্যান হয়েছে','ok');loadAdmUsers();}catch(e){toast('সমস্যা','err');}});
+  window.doUnban=async id=>{try{await unbanUser(id);toast('আনব্যান হয়েছে','ok');loadAdmUsers();}catch(e){toast('সমস্যা','err');}};
+  window.doResetProg=id=>openCF('প্রগ্রেস রিসেট?',`ID ${id} এর সব আনলক মুছবে।`,'🔄',async()=>{try{await resetProgress(id);toast('রিসেট হয়েছে','ok');}catch(e){toast('সমস্যা','err');}});
+
+  // ── Stats ────────────────────────────────────────────────
+  async function loadAdmStats(){
+    const el=document.getElementById('tab-stats');
+    el.innerHTML=`<div class="spinner-wrap"><div class="spinner"></div></div>`;
+    try{
+      const[stats,daily]=await Promise.all([getAdminStats(),getDailyStats(7)]);
+      const days=last7days();
+      const counts=days.map(d=>daily.filter(r=>r.downloaded_at?.startsWith(d)).length);
+      const mx=Math.max(...counts,1);
+      el.innerHTML=`
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-lbl">মোট ভিউ</div><div class="stat-val w">${fmtN(stats.totalViews)}</div></div>
+          <div class="stat-card"><div class="stat-lbl">মোট ডাউনলোড</div><div class="stat-val b">${fmtN(stats.totalDownloads)}</div></div>
+          <div class="stat-card"><div class="stat-lbl">মোট আনলক</div><div class="stat-val g">${fmtN(stats.unlocks)}</div></div>
+          <div class="stat-card"><div class="stat-lbl">ব্যবহারকারী</div><div class="stat-val">${fmtN(stats.users)}</div></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-ttl">গত ৭ দিনের ডাউনলোড</div>
+          <div class="bar-chart">
+            ${days.map((d,i)=>`
+              <div class="bar-item">
+                <div class="bar-fill" style="height:${Math.round((counts[i]/mx)*72)+4}px"></div>
+                <div class="bar-lbl">${d.slice(5).replace('-','/')}</div>
+              </div>`).join('')}
+          </div>
+        </div>`;
+    }catch(e){el.innerHTML=errState();}
+  }
+
+  function last7days(){return Array.from({length:7},(_,i)=>{const d=new Date();d.setDate(d.getDate()-(6-i));return d.toISOString().slice(0,10);});}
+
+  // ── Settings ─────────────────────────────────────────────
+  async function loadAdmSettings(){
+    const el=document.getElementById('tab-settings');
+    const s=await getSettings().catch(()=>({}));
+    el.innerHTML=`<div class="sec-ttl" style="margin-bottom:14px">সেটিংস</div>
+      ${setRow('অ্যাডমিন Telegram ID','admin_telegram_id',s.admin_telegram_id||String(C.ADMIN_TELEGRAM_ID),'আপনার Telegram User ID','number')}
+      ${setRow('আনলক বিজ্ঞাপন সংখ্যা','unlock_ad_count',s.unlock_ad_count||String(C.UNLOCK_AD_COUNT),'কতটি বিজ্ঞাপন দেখলে আনলক হবে','number')}
+      ${setRow('Monetag Zone ID','monetag_zone_id',s.monetag_zone_id||C.MONETAG_ZONE_ID,'Monetag Interstitial Zone ID')}
+      ${setRow('Monetag OnClick ID','monetag_onclick_id',s.monetag_onclick_id||C.MONETAG_ONCLICK_ID,'Monetag OnClick Zone ID')}
+      ${setRow('অ্যাপের নাম','app_name',s.app_name||C.APP_NAME,'অ্যাপের শিরোনাম')}`;
+  }
+
+  function setRow(label,key,val,desc,type='text'){
+    return`<div class="set-item">
+      <div class="set-info"><div class="set-lbl">${label}</div><div class="set-desc">${desc}</div></div>
+      <div class="set-ctl">
+        <input class="fi" id="s-${key}" type="${type}" value="${esc(val)}" style="width:110px;font-size:12px">
+        <button class="btn btn-pr btn-sm" onclick="doSaveSetting('${key}')">সেভ</button>
+      </div>
+    </div>`;
+  }
+
+  window.doSaveSetting=async function(key){
+    const val=document.getElementById(`s-${key}`)?.value;
+    if(val===undefined)return;
+    try{
+      await updSetting(key,val);
+      admSettings[key]=val;
+      // Also update live config
+      if(key==='unlock_ad_count') C.UNLOCK_AD_COUNT=parseInt(val)||4;
+      if(key==='monetag_zone_id') C.MONETAG_ZONE_ID=val;
+      if(key==='monetag_onclick_id') C.MONETAG_ONCLICK_ID=val;
+      toast('সংরক্ষণ হয়েছে','ok');
+    }catch(e){toast('সমস্যা হয়েছে','err');}
+  };
+
+  // ── Form Modal Helpers ────────────────────────────────────
+  let currentFM=null;
+  function openFM(title,body,onSave){
+    const ov=document.createElement('div');
+    ov.className='fm-ov'; ov.id='fm-ov';
+    ov.innerHTML=`<div class="fm-box">
+      <div class="fm-handle"></div>
+      <div class="fm-ttl">${title}</div>
+      ${body}
+      <div class="fm-acts">
+        <button class="btn btn-gh" onclick="closeFM()">বাতিল</button>
+        <button class="btn btn-pr" id="fm-save">সংরক্ষণ</button>
+      </div>
+    </div>`;
+    currentFM=ov;
+    document.body.appendChild(ov);
+    requestAnimationFrame(()=>ov.classList.add('on'));
+    ov.addEventListener('click',e=>{if(e.target===ov)closeFM();});
+    document.getElementById('fm-save').addEventListener('click',onSave);
+  }
+  window.closeFM=function(){
+    if(!currentFM)return;
+    currentFM.classList.remove('on');
+    setTimeout(()=>{currentFM?.remove();currentFM=null;},300);
+  };
+
+  // ── Confirm Dialog ────────────────────────────────────────
+  function openCF(title,msg,icon,onOk){
+    const ov=document.createElement('div');
+    ov.className='cf-ov';
+    ov.innerHTML=`<div class="cf-box">
+      <div class="cf-ico">${icon}</div>
+      <div class="cf-ttl">${title}</div>
+      <div class="cf-msg">${msg}</div>
+      <div class="cf-acts">
+        <button class="btn btn-gh" id="cf-cancel">বাতিল</button>
+        <button class="btn btn-er" id="cf-ok">নিশ্চিত</button>
+      </div>
+    </div>`;
+    document.body.appendChild(ov);
+    requestAnimationFrame(()=>ov.classList.add('on'));
+    document.getElementById('cf-cancel').onclick=()=>{ov.classList.remove('on');setTimeout(()=>ov.remove(),250)};
+    document.getElementById('cf-ok').onclick=()=>{ov.classList.remove('on');setTimeout(()=>ov.remove(),250);onOk();};
+  }
+
+  // ── UI helpers ────────────────────────────────────────────
+  function emptyState(ico,msg){return`<div class="empty"><div class="empty-ico">${ico}</div><div class="empty-ttl">${msg}</div></div>`;}
+  function errState(){return`<div class="empty"><div class="empty-ico">⚠️</div><div class="empty-ttl">ডেটা লোড সমস্যা</div></div>`;}
+
+  // ════════════════════════════════════════════════════════
+  // BOOT
+  // ════════════════════════════════════════════════════════
+  if(isAdmin){
+    document.getElementById('main-app').style.display='none';
+    document.getElementById('admin-app').style.display='block';
+    initAdmin().catch(e=>{console.error(e);document.getElementById('loading-screen').classList.add('hide');});
+  } else {
+    document.getElementById('admin-app').style.display='none';
+    initMain().catch(e=>{
+      console.error(e);
+      document.getElementById('loading-screen').classList.add('hide');
+      document.getElementById('main-app').style.display='block';
+      toast('অ্যাপ লোড সমস্যা — পেজ রিফ্রেশ করুন','err');
+    });
+  }
+  </script>
+</body>
+</html>
