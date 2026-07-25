@@ -230,14 +230,38 @@ const CONFIG = {
     </div>
     <div id="adminMain" style="display:none">
       <div class="acard">
+        <h3>🎬 Posts</h3>
+        <div class="btnrow" style="margin:8px 0 10px"><button class="btn primary" onclick="openOverlay('postOverlay',()=>openPostForm())">＋ Create Post</button></div>
+        <div id="adminPosts"></div>
+      </div>
+      <div class="acard">
+        <h3>🏷️ Categories</h3>
+        <div id="adminCats"></div>
+        <div class="btnrow" style="margin-top:12px"><button class="btn ghost" onclick="openOverlay('catOverlay',openCatForm)">＋ New Category</button></div>
+      </div>
+      <div class="acard">
+        <h3>📢 Announcement</h3>
+        <div class="srow">
+          <div class="sl">Show announcement<small>Popup shown when the app opens</small></div>
+          <label class="sw"><input type="checkbox" id="setAnnOn"><span></span></label>
+        </div>
+        <label style="font-size:12.5px;font-weight:600;color:var(--muted);display:block;margin:10px 0 5px">Announcement text (links become clickable)</label>
+        <textarea id="setAnnText" class="ann-input" placeholder="e.g. New videos every day! Join our channel: https://t.me/yourchannel"></textarea>
+        <div class="btnrow" style="margin-top:12px"><button class="btn primary" onclick="saveAnnouncement()">Save Announcement</button></div>
+      </div>
+      <div class="acard">
         <h3>⚙️ Settings</h3>
         <div class="srow">
-          <div class="sl">Ads to unlock a link<small>How many ads before the link opens</small></div>
+          <div class="sl">Ads to unlock a link<small>Default — each post can override this</small></div>
           <select id="setAdsRequired"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
         </div>
         <div class="srow">
           <div class="sl">Automatic ads<small>Interstitial ads while browsing</small></div>
           <label class="sw"><input type="checkbox" id="setInApp"><span></span></label>
+        </div>
+        <div class="srow">
+          <div class="sl">Show views &amp; downloads<small>Count badges on video cards</small></div>
+          <label class="sw"><input type="checkbox" id="setShowCounts"><span></span></label>
         </div>
         <div class="srow">
           <div class="sl">Posts per page<small>Load More shows the rest</small></div>
@@ -252,26 +276,6 @@ const CONFIG = {
           <input type="number" id="setTrendViews" min="1" step="100" />
         </div>
         <div class="btnrow" style="margin-top:14px"><button class="btn primary" onclick="saveSettings()">Save Settings</button></div>
-      </div>
-      <div class="acard">
-        <h3>📢 Announcement</h3>
-        <div class="srow">
-          <div class="sl">Show announcement<small>Popup shown when the app opens</small></div>
-          <label class="sw"><input type="checkbox" id="setAnnOn"><span></span></label>
-        </div>
-        <label style="font-size:12.5px;font-weight:600;color:var(--muted);display:block;margin:10px 0 5px">Announcement text (links become clickable)</label>
-        <textarea id="setAnnText" class="ann-input" placeholder="e.g. New videos every day! Join our channel: https://t.me/yourchannel"></textarea>
-        <div class="btnrow" style="margin-top:12px"><button class="btn primary" onclick="saveAnnouncement()">Save Announcement</button></div>
-      </div>
-      <div class="acard">
-        <h3>🎬 Posts</h3>
-        <div id="adminPosts"></div>
-        <div class="btnrow" style="margin-top:12px"><button class="btn primary" onclick="openOverlay('postOverlay',()=>openPostForm())">＋ New Post</button></div>
-      </div>
-      <div class="acard">
-        <h3>🏷️ Categories</h3>
-        <div id="adminCats"></div>
-        <div class="btnrow" style="margin-top:12px"><button class="btn ghost" onclick="openOverlay('catOverlay',openCatForm)">＋ New Category</button></div>
       </div>
     </div>
     <div class="btnrow"><button class="btn ghost" onclick="closeTopOverlay()">Close</button></div>
@@ -291,6 +295,8 @@ const CONFIG = {
     <label>Category</label><select id="pfCat"></select>
     <label>Trending?</label>
     <select id="pfTrending"><option value="false">No</option><option value="true">Yes</option></select>
+    <label>Ads to unlock this post</label>
+    <select id="pfAds"><option value="">Default (use Settings)</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
     <label>Views (starting count)</label><input id="pfViews" type="number" value="0" />
     <label>Downloads (starting count)</label><input id="pfDls" type="number" value="0" />
     <div class="btnrow">
@@ -392,6 +398,7 @@ let settings = {
   posts_per_page: 10,
   auto_trending: false,
   trending_min_views: 1000,
+  show_counts: true,
   announcement_on: false,
   announcement_text: ""
 };
@@ -415,6 +422,7 @@ async function loadSettings() {
   if (map.posts_per_page) settings.posts_per_page = Math.max(1, Number(map.posts_per_page) || 10);
   if (map.auto_trending !== undefined) settings.auto_trending = map.auto_trending === "true";
   if (map.trending_min_views) settings.trending_min_views = Math.max(1, Number(map.trending_min_views) || 1000);
+  if (map.show_counts !== undefined) settings.show_counts = map.show_counts === "true";
   if (map.announcement_on !== undefined) settings.announcement_on = map.announcement_on === "true";
   if (map.announcement_text !== undefined) settings.announcement_text = map.announcement_text;
   visibleCount = settings.posts_per_page;
@@ -458,6 +466,7 @@ async function saveSettings() {
   const vals = {
     ads_required: document.getElementById("setAdsRequired").value,
     inapp_ads: String(document.getElementById("setInApp").checked),
+    show_counts: String(document.getElementById("setShowCounts").checked),
     posts_per_page: document.getElementById("setPerPage").value,
     auto_trending: String(document.getElementById("setAutoTrend").checked),
     trending_min_views: String(Math.max(1, Number(document.getElementById("setTrendViews").value) || 1000))
@@ -468,6 +477,7 @@ async function saveSettings() {
   const wasOn = settings.inapp_ads;
   settings.ads_required = Number(vals.ads_required);
   settings.inapp_ads = vals.inapp_ads === "true";
+  settings.show_counts = vals.show_counts === "true";
   settings.posts_per_page = Number(vals.posts_per_page);
   settings.auto_trending = vals.auto_trending === "true";
   settings.trending_min_views = Number(vals.trending_min_views);
@@ -541,8 +551,9 @@ function setCat(id) { activeCat = id; visibleCount = settings.posts_per_page; re
 let visibleCount = settings.posts_per_page;
 function loadMore() { visibleCount += settings.posts_per_page; render(); }
 
+const reqFor = p => Math.max(1, Number(p.ads_required) || settings.ads_required);
 function cardHTML(p, topRank) {
-  const REQ = settings.ads_required;
+  const REQ = reqFor(p);
   const prog = getProgress(p.id);
   const unlocked = prog >= REQ;
   const busy = adBusyPostId == p.id;
@@ -553,8 +564,8 @@ function cardHTML(p, topRank) {
     <div class="thumbwrap">${thumb}
       ${topRank ? `<div class="badge-top">Top ${topRank}</div>` : ""}
       <div class="playbtn">${ICON_PLAY}</div>
-      <div class="stat views">${ICON_EYE} ${fmt(p.views || 0)}</div>
-      <div class="stat dls">${ICON_DL} ${fmt(p.downloads || 0)}</div>
+      ${settings.show_counts ? `<div class="stat views">${ICON_EYE} ${fmt(p.views || 0)}</div>
+      <div class="stat dls">${ICON_DL} ${fmt(p.downloads || 0)}</div>` : ""}
     </div>
     <h3>${esc(p.title)}</h3>
     ${p.description ? `<div class="desc">${esc(p.description)}</div>` : ""}
@@ -573,7 +584,7 @@ let adBusyPostId = null;
 async function startUnlock(id) {
   const p = posts.find(x => x.id == id);
   if (!p || adBusyPostId) return;
-  const REQ = settings.ads_required;
+  const REQ = reqFor(p);
   if (!viewedThisSession.has(id)) {
     viewedThisSession.add(id);
     p.views = (p.views || 0) + 1;
@@ -591,10 +602,10 @@ async function startUnlock(id) {
     const prog = getProgress(id);
     done();
     if (prog >= REQ) {
-      showToast(`All ${REQ} ads completed! Unlocking your link...`);
+      showToast("🎉 Unlocked!");
       setTimeout(() => goToLink(p), 900);
     } else {
-      showToast(`${prog} of ${REQ} ads completed — ${REQ - prog} more to unlock`);
+      showToast(`✅ Ad ${prog}/${REQ} done`);
     }
   }).catch(() => { done(); showToast("Ad failed to load. Please try again."); });
 }
@@ -612,6 +623,7 @@ function fillSettingsForm() {
   document.getElementById("setPerPage").value = String(settings.posts_per_page);
   document.getElementById("setAutoTrend").checked = settings.auto_trending;
   document.getElementById("setTrendViews").value = settings.trending_min_views;
+  document.getElementById("setShowCounts").checked = settings.show_counts;
   document.getElementById("setAnnOn").checked = settings.announcement_on;
   document.getElementById("setAnnText").value = settings.announcement_text;
 }
@@ -657,6 +669,7 @@ function openPostForm(id) {
   document.getElementById("pfThumb").value = p?.thumbnail_url || "";
   document.getElementById("pfLink").value = p?.link_url || "";
   document.getElementById("pfTrending").value = String(p?.is_trending || false);
+  document.getElementById("pfAds").value = p?.ads_required ? String(p.ads_required) : "";
   document.getElementById("pfViews").value = p?.views || 0;
   document.getElementById("pfDls").value = p?.downloads || 0;
   document.getElementById("pfCat").innerHTML = `<option value="">— None —</option>` +
@@ -671,6 +684,7 @@ async function savePost() {
     link_url: document.getElementById("pfLink").value.trim(),
     category_id: document.getElementById("pfCat").value || null,
     is_trending: document.getElementById("pfTrending").value === "true",
+    ads_required: document.getElementById("pfAds").value ? Number(document.getElementById("pfAds").value) : null,
     views: Number(document.getElementById("pfViews").value || 0),
     downloads: Number(document.getElementById("pfDls").value || 0)
   };
