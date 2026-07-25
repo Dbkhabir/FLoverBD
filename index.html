@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Family Lover BD</title>
 
-  <!-- External Scripts -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.tailwindcss.com"></script>
@@ -19,41 +18,97 @@
     const ADS_REQUIRED      = 3; 
   </script>
 
-  <!-- MONETAG INTERSTITIAL SCRIPT -->
-  <!-- এই স্ক্রিপ্টটিই স্ক্রিনশটের মতো অ্যাড দেখাবে -->
-  <script src="//groleegni.net/401/11394615" async data-cfasync="false"></script>
+  <!-- MONETAG REWARDING INTERSTITIAL SCRIPT -->
+  <script src="https://groleegni.net/401/11394615" async data-cfasync="false"></script>
 
+  <style>
+    * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #f3f4f6; transition: 0.3s; }
+    body.dark-mode { background: #121212; color: white; }
+    .no-scroll::-webkit-scrollbar { display: none; }
+    .no-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+    
+    .featured-slider { display: flex; overflow-x: auto; gap: 12px; padding: 10px 15px; scroll-snap-type: x mandatory; }
+    .slider-item { flex: 0 0 85%; scroll-snap-align: start; position: relative; border-radius: 15px; overflow: hidden; aspect-ratio: 16/9; cursor: pointer; }
+    
+    .unlock-btn { background: linear-gradient(90deg, #3b82f6, #1d4ed8); }
+    .card-anim { animation: fadeInUp 0.4s ease forwards; }
+    @keyframes fadeInUp { from { opacity:0; transform:translateY(15px); } to { opacity:1; transform:translateY(0); } }
+  </style>
 </head>
-<body class="bg-gray-100 font-sans">
+<body>
 
 <div id="app">
-  <!-- Header -->
-  <header class="sticky top-0 z-30 bg-white border-b px-4 py-3 flex items-center justify-between">
+  <!-- HEADER -->
+  <header id="header" class="sticky top-0 z-30 bg-white border-b px-4 py-3 flex items-center justify-between dark:bg-[#1a1a1a] dark:border-gray-800">
     <div class="flex items-center gap-2">
       <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-white">FL</div>
-      <span class="font-bold text-lg">Viral Link Hub ⚡</span>
+      <span id="logo-text" class="font-bold text-lg dark:text-white">Family Lover BD</span>
     </div>
-    <button id=\"admin-btn\" onclick=\"openAdmin()\" class=\"hidden bg-gray-200 p-2 rounded-full\">⚙️</button>
+    
+    <div class="flex items-center gap-3">
+       <button id="admin-btn" onclick="openAdmin()" class="hidden p-2 bg-gray-100 rounded-full dark:bg-gray-800">⚙️</button>
+       <button onclick="toggleDark()" class="p-2 bg-gray-100 rounded-full dark:bg-gray-800">🌙</button>
+    </div>
   </header>
 
-  <!-- Search -->
-  <div class=\"p-4\">
-    <input type=\"text\" id=\"search-input\" oninput=\"handleSearch()\" placeholder=\"Search videos...\" class=\"w-full p-3 rounded-xl border outline-none bg-white\">
+  <!-- SEARCH BAR -->
+  <div class="px-4 py-3">
+    <div class="bg-white dark:bg-[#1e1e1e] flex items-center px-3 py-2 rounded-xl border dark:border-gray-700">
+      <input type="text" id="search-input" oninput="handleSearch()" placeholder="Search videos..." class="bg-transparent w-full outline-none text-sm dark:text-white">
+      <span class="text-gray-400">🔍</span>
+    </div>
   </div>
 
-  <!-- Feed -->
-  <div id="feed" class="px-4 pb-10 space-y-4"></div>
+  <!-- TRENDING SLIDER -->
+  <div id="featured-section">
+    <h3 class="px-4 text-sm font-bold text-gray-500 uppercase tracking-wider mb-1">Trending 🔥</h3>
+    <div id="slider" class="featured-slider no-scroll"></div>
+  </div>
 
-  <!-- ADMIN MODAL -->
-  <div id="admin-modal" class="hidden fixed inset-0 z-50 bg-white p-4 overflow-y-auto">
-    <div class="flex justify-between mb-6"><h2 class="text-xl font-bold">Admin</h2><button onclick="closeAdmin()" class="text-red-500">Close</button></div>
-    <div class="space-y-3">
-        <input id="f-title" placeholder="Title" class="w-full p-3 border rounded-lg">
-        <input id="f-thumb" placeholder="Image Link" class="w-full p-3 border rounded-lg">
-        <input id="f-url" placeholder="Video Link" class="w-full p-3 border rounded-lg">
-        <button onclick="submitPost()" class="w-full py-4 bg-blue-600 text-white rounded-lg font-bold">Publish</button>
-    </div>
-    <div id="admin-list" class="mt-8 space-y-2"></div>
+  <!-- CATEGORIES -->
+  <div id="filter-bar" class="flex gap-2 px-4 py-3 no-scroll overflow-x-auto">
+    <button onclick="setCategory('all')" data-cat="all" class="cat-btn px-4 py-1.5 rounded-full text-xs font-bold bg-blue-600 text-white">All</button>
+    <button onclick="setCategory('hot')" data-cat="hot" class="cat-btn px-4 py-1.5 rounded-full text-xs font-bold bg-white border dark:bg-gray-800 dark:border-gray-700">Hot 🌶️</button>
+    <button onclick="setCategory('trending')" data-cat="trending" class="cat-btn px-4 py-1.5 rounded-full text-xs font-bold bg-white border dark:bg-gray-800 dark:border-gray-700">Viral 🚀</button>
+  </div>
+
+  <!-- MAIN FEED -->
+  <div id="feed" class="px-4 pb-10"></div>
+
+  <!-- FOOTER -->
+  <footer class="mt-10 py-10 text-center border-t border-gray-200 dark:border-gray-800 transition-colors">
+    <p class="text-sm text-gray-500 dark:text-gray-400">© 2025 Family Lover BD. All Rights Reserved.</p>
+    <p class="text-xs text-gray-400 dark:text-gray-600 mt-1 uppercase tracking-widest">Designed by Wanda</p>
+  </footer>
+</div>
+
+<!-- ADMIN MODAL -->
+<div id="admin-modal" class="hidden fixed inset-0 z-50 bg-white overflow-y-auto p-4 dark:bg-[#121212]">
+  <div class="flex justify-between items-center mb-6 border-b pb-4">
+    <h1 class="text-xl font-bold dark:text-white">Admin Panel ⚙️</h1>
+    <button onclick="closeAdmin()" class="text-red-500 font-bold">Close ✖</button>
+  </div>
+
+  <div class="flex gap-2 mb-6">
+    <button onclick="adminTab('add')" class="flex-1 py-2 bg-gray-100 rounded-lg text-sm font-bold dark:bg-gray-800 dark:text-white">Add Post</button>
+    <button onclick="adminTab('manage')" class="flex-1 py-2 bg-gray-100 rounded-lg text-sm font-bold dark:bg-gray-800 dark:text-white">Manage All</button>
+  </div>
+
+  <div id="admin-add" class="space-y-4">
+    <input id="f-title" type="text" placeholder="Video Title" class="w-full p-3 border rounded-xl dark:bg-gray-800 dark:border-gray-700 dark:text-white">
+    <input id="f-thumb" type="text" placeholder="Image Link" class="w-full p-3 border rounded-xl dark:bg-gray-800 dark:border-gray-700 dark:text-white">
+    <input id="f-url" type="text" placeholder="Video/Target Link" class="w-full p-3 border rounded-xl dark:bg-gray-800 dark:border-gray-700 dark:text-white">
+    <select id="f-cat" class="w-full p-3 border rounded-xl dark:bg-gray-800 dark:border-gray-700 dark:text-white">
+        <option value="all">Default</option>
+        <option value="hot">Hot 🌶️</option>
+        <option value="trending">Trending 🚀</option>
+    </select>
+    <button onclick="submitPost()" class="w-full py-4 bg-blue-600 text-white rounded-xl font-bold">Publish</button>
+  </div>
+
+  <div id="admin-manage" class="hidden space-y-4">
+    <div id="admin-list"></div>
   </div>
 </div>
 
@@ -61,7 +116,7 @@
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let allPosts = [];
 let currentUserId = 'unknown';
-let unlockData = {};
+let unlockProgress = {};
 
 window.addEventListener('DOMContentLoaded', async () => {
   const tg = window.Telegram?.WebApp;
@@ -74,49 +129,69 @@ window.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function loadPosts() {
-  const { data: posts } = await sb.from('posts').select('*').order('created_at', {ascending: false});
+  const { data } = await sb.from('posts').select('*').order('created_at', { ascending: false });
   const { data: progress } = await sb.from('ad_watches').select('*').eq('telegram_user_id', currentUserId);
   
-  if (posts) allPosts = posts;
-  if (progress) progress.forEach(p => unlockData[p.post_id] = p);
-  renderFeed();
+  if (data) allPosts = data;
+  if (progress) progress.forEach(p => unlockProgress[p.post_id] = p);
+  
+  renderSlider();
+  renderFeed(allPosts);
 }
 
-function renderFeed() {
+function renderSlider() {
+  const slider = document.getElementById('slider');
+  const trending = [...allPosts].sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 5);
+  slider.innerHTML = trending.map(p => `
+    <div class="slider-item" onclick="triggerAd(${p.id})">
+      <img src="${p.thumbnail_url}" class="w-full h-full object-cover">
+      <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-3">
+        <h4 class="text-white text-sm font-bold line-clamp-1">${p.title}</h4>
+        <p class="text-blue-400 text-[10px] font-bold">👁 ${p.views || 0} VIEWS</p>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderFeed(posts) {
   const feed = document.getElementById('feed');
-  feed.innerHTML = allPosts.map(p => {
-    const prog = unlockData[p.id] || { ad_count: 0, unlocked: false };
+  feed.innerHTML = posts.map(p => {
+    const prog = unlockProgress[p.id] || { ad_count: 0, unlocked: false };
     return `
-      <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
-        <img src="${p.thumbnail_url}" class="w-full aspect-video object-cover" onclick="handleUnlock(${p.id})">
-        <div class="p-4">
-          <h3 class="font-bold mb-3 text-sm line-clamp-2">${p.title}</h3>
+    <div class="bg-white dark:bg-[#1e1e1e] rounded-2xl overflow-hidden mb-5 shadow-sm card-anim border border-gray-100 dark:border-gray-800">
+      <div class="relative" onclick="triggerAd(${p.id})">
+        <img src="${p.thumbnail_url}" class="w-full aspect-video object-cover">
+        <div class="absolute bottom-2 left-2 bg-black/60 text-white text-[10px] px-2 py-1 rounded-md">👁 ${p.views || 0} Views</div>
+      </div>
+      <div class="p-4">
+        <h3 class="font-bold text-sm mb-3 line-clamp-2 dark:text-white">${p.title}</h3>
+        <div id="btn-area-${p.id}">
           ${prog.unlocked ? 
-            `<a href="${p.target_url}" target="_blank" class="block w-full py-3 bg-green-500 text-white text-center rounded-xl font-bold shadow-lg">Watch Now ✅</a>` :
-            `<button onclick="handleUnlock(${p.id})" class="w-full py-3 bg-blue-600 text-white rounded-xl font-bold shadow-lg">🔓 Unlock Link (${prog.ad_count}/${ADS_REQUIRED})</button>`
+            `<a href="${p.target_url}" target="_blank" class="block w-full py-3 bg-green-500 text-white text-center rounded-xl font-bold">Download / Watch Now</a>` :
+            `<button onclick="triggerAd(${p.id})" class="w-full py-3 unlock-btn text-white rounded-xl font-bold flex items-center justify-center gap-2">
+              🔓 Unlock Link (${prog.ad_count}/${ADS_REQUIRED})
+            </button>`
           }
         </div>
-      </div>`;
+      </div>
+    </div>`;
   }).join('');
 }
 
-// এই ফাংশনটি ক্লিক করলে Monetag-এর অ্যাড দেখাবে
-async function handleUnlock(postId) {
-  // ১. Monetag ইন্টারস্টিশিয়াল অ্যাড ট্রিগার করা
-  if (typeof window.show_8961314 === 'function') { // Monetag function (if available)
+// এটি ক্লিক করলে Monetag-এর ১৫ সেকেন্ডের অ্যাড দেখাবে
+async function triggerAd(postId) {
+  // Monetag ইন্টারস্টিশিয়াল ট্রিগার (স্ক্রিনশটের মতো অ্যাড আসবে)
+  if (typeof window.show_8961314 === 'function') {
       window.show_8961314();
   } else {
-      // যদি স্ক্রিপ্ট সরাসরি বাটন ডিটেক্ট না করে তবে পপ-আপ হিসেবে খুলবে
+      // ব্যাকআপ হিসেবে ডিরেক্ট লিঙ্ক পপ-আপ
       window.open(`https://groleegni.net/401/${MONETAG_ZONE_ID}`, '_blank');
   }
 
-  // ২. ডাটাবেসে কাউন্ট আপডেট করা (অ্যাড দেখানোর পর)
-  let prog = unlockData[postId] || { ad_count: 0, unlocked: false };
+  // ডাটাবেসে অ্যাড কাউন্ট আপডেট করা
+  let prog = unlockProgress[postId] || { ad_count: 0, unlocked: false };
   prog.ad_count++;
-  
-  if (prog.ad_count >= ADS_REQUIRED) {
-    prog.unlocked = true;
-  }
+  if (prog.ad_count >= ADS_REQUIRED) prog.unlocked = true;
 
   const { error } = await sb.from('ad_watches').upsert({ 
     telegram_user_id: currentUserId, 
@@ -125,48 +200,72 @@ async function handleUnlock(postId) {
     unlocked: prog.unlocked 
   }, { onConflict: 'telegram_user_id,post_id' });
 
-  if (!error) {
-    unlockData[postId] = prog;
-    renderFeed();
-    if(prog.unlocked) alert("অভিনন্দন! লিঙ্ক আনলক হয়েছে।");
-    else alert(`অ্যাড সফল হয়েছে! আর ${ADS_REQUIRED - prog.ad_count} টি অ্যাড দেখুন।`);
+  // ভিউ বাড়ানো
+  await sb.from('posts').update({ views: (allPosts.find(x => x.id === postId).views || 0) + 1 }).eq('id', postId);
+
+  if(!error) {
+    unlockProgress[postId] = prog;
+    renderSlider();
+    renderFeed(allPosts);
+    if(prog.unlocked) alert("Unlocked! You can now watch the video.");
+    else alert(`Ad successfully watched! (${prog.ad_count}/${ADS_REQUIRED})`);
   }
 }
 
-// Search and Admin Functions
 function handleSearch() {
   const query = document.getElementById('search-input').value.toLowerCase();
   const filtered = allPosts.filter(p => p.title.toLowerCase().includes(query));
-  const feed = document.getElementById('feed');
-  // Re-render feed with filtered posts...
+  renderFeed(filtered);
 }
 
-function openAdmin() { document.getElementById('admin-modal').classList.remove('hidden'); loadAdminList(); }
+function setCategory(cat) {
+  document.querySelectorAll('.cat-btn').forEach(btn => {
+    btn.classList.remove('bg-blue-600', 'text-white');
+    if(btn.dataset.cat === cat) btn.classList.add('bg-blue-600', 'text-white');
+  });
+  const filtered = cat === 'all' ? allPosts : allPosts.filter(p => p.category === cat);
+  renderFeed(filtered);
+}
+
+function toggleDark() {
+  document.documentElement.classList.toggle('dark');
+  document.body.classList.toggle('dark-mode');
+}
+
+// ADMIN FUNCTIONS
+function openAdmin() { document.getElementById('admin-modal').classList.remove('hidden'); }
 function closeAdmin() { document.getElementById('admin-modal').classList.add('hidden'); }
+function adminTab(tab) {
+    document.getElementById('admin-add').classList.toggle('hidden', tab !== 'add');
+    document.getElementById('admin-manage').classList.toggle('hidden', tab !== 'manage');
+    if(tab === 'manage') loadAdminList();
+}
 
 async function submitPost() {
   const title = document.getElementById('f-title').value;
   const thumb = document.getElementById('f-thumb').value;
   const url = document.getElementById('f-url').value;
+  const cat = document.getElementById('f-cat').value;
   if(!title || !thumb || !url) return alert("Fill all fields");
-  await sb.from('posts').insert([{ title, thumbnail_url: thumb, target_url: url }]);
-  location.reload();
+  const { error } = await sb.from('posts').insert([{ title, thumbnail_url: thumb, target_url: url, category: cat }]);
+  if(!error) { alert("Published!"); location.reload(); }
 }
 
 async function loadAdminList() {
   const { data } = await sb.from('posts').select('*').order('created_at', {ascending: false});
   document.getElementById('admin-list').innerHTML = data.map(p => `
-    <div class="p-3 bg-gray-50 flex justify-between items-center rounded-lg border">
-      <span class="text-xs font-bold truncate w-40">${p.title}</span>
-      <button onclick="deletePost(${p.id})" class="text-red-500 text-sm">Delete</button>
+    <div class="p-3 border rounded-xl mb-2 flex items-center gap-3 bg-gray-50 dark:bg-gray-800 dark:border-gray-700">
+      <img src="${p.thumbnail_url}" class="w-12 h-12 rounded object-cover">
+      <div class="flex-1">
+        <p class="text-sm font-bold dark:text-white line-clamp-1">${p.title}</p>
+        <p class="text-[10px] text-gray-500">Views: ${p.views || 0}</p>
+      </div>
+      <button onclick=\"deletePost(${p.id})\" class=\"text-red-500 text-sm font-bold\">Delete</button>
     </div>`).join('');
 }
 
 async function deletePost(id) {
-    if(confirm("Delete this post?")) {
-        await sb.from('posts').delete().eq('id', id);
-        loadAdminList();
-    }
+    if(confirm("Delete?")) { await sb.from('posts').delete().eq('id', id); loadAdminList(); }
 }
 </script>
 </body>
