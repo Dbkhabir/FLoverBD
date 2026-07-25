@@ -1,2098 +1,462 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#090912">
-  <title>Family Lover BD</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Family Lover BD ⚡</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+  :root{
+    --primary:#4338f5; --primary2:#6d28d9;
+    --bg:#f4f5fb; --card:#ffffff; --text:#111318; --muted:#6b7280;
+    --chip:#0f1222; --radius:20px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',system-ui,-apple-system,sans-serif;-webkit-tap-highlight-color:transparent}
+  body{background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:40px;max-width:560px;margin:0 auto}
+  body.dark{--bg:#0e1017;--card:#181b25;--text:#f1f2f6;--muted:#9aa0ae;--chip:#4338f5}
 
-  <!-- ══════════════════════════════════════════════════
-       ⚙️  CONFIG — শুধু এই অংশটি সম্পাদনা করুন
-       ══════════════════════════════════════════════════ -->
-  <script>
-    const APP_CONFIG = {
-      // ── Supabase ─────────────────────────────────────
-      SUPABASE_URL:        'https://https://ibkuwmizjehwxljkypru.supabase.co.supabase.co',
-      SUPABASE_ANON_KEY:   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlia3V3bWl6amVod3hsamt5cHJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ5NjUyNjYsImV4cCI6MjEwMDU0MTI2Nn0.wsygONI7Jq8JqtqRtXf2YtV0WUDU1JtU34V-1KTzbkU',
+  /* Header */
+  header{position:sticky;top:0;z-index:50;background:var(--card);padding:12px 16px;display:flex;align-items:center;gap:10px;box-shadow:0 1px 8px rgba(0,0,0,.06)}
+  .logo{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--primary),var(--primary2));display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px}
+  .brand{font-size:19px;font-weight:800}
+  .brand span{color:var(--primary)}
+  .hbtns{margin-left:auto;display:flex;gap:6px}
+  .hbtn{width:36px;height:36px;border-radius:50%;border:none;background:transparent;font-size:17px;cursor:pointer;color:var(--text)}
 
-      // ── Admin ─────────────────────────────────────────
-      ADMIN_TELEGRAM_ID:   8717168026,           // https://t.me/userinfobot থেকে পান
+  /* Search */
+  .searchbar{display:none;padding:10px 16px;background:var(--card)}
+  .searchbar.show{display:block}
+  .searchbar input{width:100%;padding:11px 16px;border-radius:14px;border:1.5px solid #e2e4ee;background:var(--bg);color:var(--text);font-size:15px;outline:none}
 
-      // ── Monetag ───────────────────────────────────────
-      // Monetag Dashboard → Rewarded Interstitial → Zone ID (শুধু নম্বরটি)
-      // উদাহরণ: show_11394615() → Zone ID হলো "11394615"
-      MONETAG_ZONE_ID:     '11394615',          // Rewarded Interstitial Zone ID
+  /* Category chips */
+  .chips{display:flex;gap:10px;padding:16px;overflow-x:auto;scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:0 0 auto;padding:10px 20px;border-radius:24px;background:var(--card);border:1px solid #e5e7f0;font-size:14.5px;font-weight:600;cursor:pointer;color:var(--text);white-space:nowrap}
+  .chip.active{background:var(--chip);color:#fff;border-color:var(--chip)}
 
-      // ── App Settings ──────────────────────────────────
-      APP_NAME:            'Family Lover BD',
-      UNLOCK_AD_COUNT:     3,           // কতটি ad দেখলে unlock হবে
-      ITEMS_PER_PAGE:      12,
-    };
-  </script>
+  /* Sections */
+  .section-title{display:flex;align-items:center;gap:8px;font-size:21px;font-weight:800;padding:8px 16px 14px}
+  .section-title .ico{width:34px;height:34px;border-radius:10px;background:#ffe9d6;display:flex;align-items:center;justify-content:center;font-size:17px}
 
-  <!-- Telegram WebApp SDK -->
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  /* Trending row */
+  .trow{display:flex;gap:14px;overflow-x:auto;padding:2px 16px 8px;scrollbar-width:none}
+  .trow::-webkit-scrollbar{display:none}
+  .trow .card{flex:0 0 78%}
 
-  <!-- Google Font for Bengali -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+  /* Cards */
+  .list{padding:0 16px;display:flex;flex-direction:column;gap:18px}
+  .card{background:var(--card);border-radius:var(--radius);padding:12px;box-shadow:0 2px 14px rgba(20,20,60,.07)}
+  .thumbwrap{position:relative;border-radius:14px;overflow:hidden;aspect-ratio:16/10;background:#dfe2ef}
+  .thumbwrap img{width:100%;height:100%;object-fit:cover;display:block}
+  .thumb-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:40px;background:linear-gradient(135deg,#c7cbf5,#e8e9fb)}
+  .playbtn{position:absolute;inset:0;margin:auto;width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.85);display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--primary)}
+  .badge-top{position:absolute;top:10px;left:10px;background:linear-gradient(135deg,#ff6a00,#ff2d55);color:#fff;font-size:12px;font-weight:700;padding:5px 10px;border-radius:10px}
+  .stat{position:absolute;bottom:10px;font-size:12px;font-weight:600;color:#fff;background:rgba(15,17,30,.72);padding:5px 10px;border-radius:20px;display:flex;align-items:center;gap:5px}
+  .stat.views{left:10px}.stat.dls{right:10px;background:rgba(16,120,60,.85)}
+  .card h3{font-size:16.5px;font-weight:700;margin:12px 4px 4px;line-height:1.35}
+  .card .desc{font-size:13px;color:var(--muted);margin:0 4px 10px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .cta{width:100%;padding:14px;border:none;border-radius:16px;background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;font-size:15.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .12s}
+  .cta:active{transform:scale(.97)}
+  .cta.done{background:linear-gradient(135deg,#059669,#10b981)}
 
-  <style>
-    /* ────────────────────────────────────────
-       ROOT VARIABLES
-    ──────────────────────────────────────── */
-    :root {
-      --bg:      #090912;
-      --bg2:     #10101e;
-      --bg3:     #161628;
-      --bg4:     #1e1e35;
-      --card:    #12122a;
-      --txt:     #f0f0ff;
-      --txt2:    #9090b0;
-      --txt3:    #555575;
-      --acc:     #e8175d;
-      --acc2:    #c0134d;
-      --acc3:    #ff3d7f;
-      --ok:      #10b981;
-      --ok2:     #059669;
-      --warn:    #f59e0b;
-      --err:     #ef4444;
-      --info:    #6366f1;
-      --br:      #1e1e38;
-      --br2:     #2a2a48;
-      --glow:    rgba(232,23,93,0.25);
-      --font:    'Hind Siliguri','Segoe UI','Noto Sans Bengali',Arial,sans-serif;
-      --r:       14px;
-      --r2:      10px;
-      --r3:      20px;
-    }
+  .empty{text-align:center;color:var(--muted);padding:50px 20px;font-size:15px}
 
-    *,*::before,*::after { box-sizing:border-box; margin:0; padding:0 }
-    html { font-size:16px; scroll-behavior:smooth }
-    body {
-      font-family: var(--font);
-      background: var(--bg);
-      color: var(--txt);
-      min-height: 100vh;
-      max-width: 480px;
-      margin: 0 auto;
-      overflow-x: hidden;
-      -webkit-tap-highlight-color: transparent;
-    }
-    a { color:inherit; text-decoration:none }
-    img { max-width:100%; height:auto; display:block }
-    button { cursor:pointer; font-family:var(--font); border:none; outline:none }
-    input,textarea,select { font-family:var(--font); outline:none }
-    ::-webkit-scrollbar { width:3px }
-    ::-webkit-scrollbar-track { background:transparent }
-    ::-webkit-scrollbar-thumb { background:var(--br2); border-radius:2px }
+  /* Modal */
+  .overlay{position:fixed;inset:0;background:rgba(10,12,25,.55);z-index:100;display:none;align-items:flex-end;justify-content:center}
+  .overlay.show{display:flex}
+  .modal{background:var(--card);width:100%;max-width:520px;max-height:88vh;overflow-y:auto;border-radius:24px 24px 0 0;padding:22px 18px 30px;animation:up .25s ease}
+  @keyframes up{from{transform:translateY(60px);opacity:0}to{transform:none;opacity:1}}
+  .modal h2{font-size:19px;margin-bottom:16px}
+  .modal label{font-size:13px;font-weight:600;color:var(--muted);display:block;margin:12px 0 5px}
+  .modal input,.modal textarea,.modal select{width:100%;padding:11px 13px;border-radius:12px;border:1.5px solid #e2e4ee;background:var(--bg);color:var(--text);font-size:14.5px;outline:none}
+  .modal textarea{resize:vertical;min-height:70px}
+  .btnrow{display:flex;gap:10px;margin-top:18px}
+  .btn{flex:1;padding:13px;border:none;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer}
+  .btn.primary{background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff}
+  .btn.ghost{background:var(--bg);color:var(--text)}
+  .btn.danger{background:#fee2e2;color:#dc2626}
 
-    #loading-screen { display:none !important }
+  /* Unlock progress modal */
+  .unlock-box{text-align:center;padding:10px 6px}
+  .unlock-box .lockico{font-size:46px;margin-bottom:10px}
+  .unlock-box p{color:var(--muted);font-size:14px;margin:8px 0 18px;line-height:1.5}
+  .dots{display:flex;gap:10px;justify-content:center;margin-bottom:20px}
+  .dot{width:14px;height:14px;border-radius:50%;background:#e2e4ee}
+  .dot.on{background:linear-gradient(135deg,var(--primary),var(--primary2))}
 
-    /* ────────────────────────────────────────
-       HEADER
-    ──────────────────────────────────────── */
-    .header {
-      position: sticky; top: 0; z-index: 100;
-      background: rgba(9,9,18,.85);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--br);
-      padding: 12px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .h-brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .h-icon {
-      width: 38px; height: 38px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, var(--acc), #7c3aed);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      box-shadow: 0 4px 16px var(--glow);
-      flex-shrink: 0;
-    }
-    .h-title { font-size:15px; font-weight:700; line-height:1.2 }
-    .h-sub   { font-size:10px; color:var(--txt3); margin-top:1px }
-    .h-user  { display:flex; align-items:center; gap:8px }
-    .h-avatar {
-      width:34px; height:34px;
-      border-radius:50%;
-      background: linear-gradient(135deg,#6366f1,#a78bfa);
-      display:flex; align-items:center; justify-content:center;
-      font-size:14px; font-weight:700; color:#fff;
-      border: 2px solid var(--br2);
-    }
-    .h-uname {
-      font-size:12px; color:var(--txt2);
-      max-width:80px;
-      overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-    }
+  /* Admin */
+  .admin-fab{position:fixed;bottom:22px;right:18px;z-index:60;width:56px;height:56px;border-radius:50%;border:none;background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;font-size:24px;cursor:pointer;box-shadow:0 6px 20px rgba(67,56,245,.4);display:none}
+  .admin-list-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #eceef5}
+  .admin-list-item .t{flex:1;font-size:14px;font-weight:600}
+  .mini{padding:7px 12px;border-radius:10px;border:none;font-size:12.5px;font-weight:700;cursor:pointer}
+  .mini.edit{background:#e0e7ff;color:#4338f5}.mini.del{background:#fee2e2;color:#dc2626}
 
-    /* ────────────────────────────────────────
-       CATEGORY BAR
-    ──────────────────────────────────────── */
-    .cat-wrap {
-      position: sticky; top: 63px; z-index: 99;
-      background: rgba(9,9,18,.9);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--br);
-      padding: 10px 0;
-    }
-    .cat-scroll {
-      display: flex;
-      gap: 8px;
-      padding: 0 16px;
-      overflow-x: auto;
-      scrollbar-width: none;
-    }
-    .cat-scroll::-webkit-scrollbar { display:none }
-    .cat-pill {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      padding: 7px 16px;
-      background: var(--bg3);
-      border: 1px solid var(--br);
-      border-radius: 20px;
-      font-size: 13px;
-      color: var(--txt2);
-      white-space: nowrap;
-      cursor: pointer;
-      transition: all .2s;
-      flex-shrink: 0;
-      font-weight: 500;
-    }
-    .cat-pill:hover { background:var(--bg4); color:var(--txt) }
-    .cat-pill.active {
-      background: linear-gradient(135deg, var(--acc), var(--acc2));
-      border-color: var(--acc);
-      color: #fff;
-      font-weight: 600;
-      box-shadow: 0 4px 16px var(--glow);
-    }
-
-    /* ────────────────────────────────────────
-       FEED
-    ──────────────────────────────────────── */
-    .feed {
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    /* ────────────────────────────────────────
-       POST CARD — New Design
-    ──────────────────────────────────────── */
-    .post-card {
-      background: var(--card);
-      border: 1px solid var(--br);
-      border-radius: var(--r3);
-      overflow: hidden;
-      transition: transform .2s, box-shadow .2s;
-      animation: fadeUp .35s ease forwards;
-      opacity: 0;
-    }
-    @keyframes fadeUp {
-      from { opacity:0; transform:translateY(20px) }
-      to   { opacity:1; transform:translateY(0) }
-    }
-    .post-card:hover { transform:translateY(-3px); box-shadow:0 12px 40px rgba(0,0,0,.6) }
-
-    /* Thumbnail — portrait style with overlay */
-    .post-thumb {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 16/9;
-      overflow: hidden;
-      background: var(--bg3);
-    }
-    .post-thumb img {
-      width:100%; height:100%;
-      object-fit: cover;
-      transition: transform .5s;
-    }
-    .post-card:hover .post-thumb img { transform:scale(1.06) }
-    .post-thumb .no-img {
-      width:100%; height:100%;
-      display: flex; align-items:center; justify-content:center;
-      font-size: 52px;
-      background: linear-gradient(135deg,var(--bg3),var(--bg4));
-    }
-
-    /* Gradient overlay on image */
-    .post-thumb-ov {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to top, rgba(9,9,18,.95) 0%, rgba(9,9,18,.4) 50%, transparent 100%);
-    }
-
-    /* Category badge on image */
-    .post-cat {
-      position: absolute;
-      top: 12px;
-      left: 12px;
-      background: rgba(255,255,255,.12);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      border: 1px solid rgba(255,255,255,.15);
-      border-radius: 20px;
-      padding: 4px 12px;
-      font-size: 11px;
-      color: #fff;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    /* Title overlaid on image bottom */
-    .post-title-ov {
-      position: absolute;
-      bottom: 12px;
-      left: 14px;
-      right: 14px;
-      font-size: 15px;
-      font-weight: 700;
-      color: #fff;
-      line-height: 1.4;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      text-shadow: 0 1px 8px rgba(0,0,0,.8);
-    }
-
-    /* Card body below image */
-    .post-body {
-      padding: 14px 14px 16px;
-    }
-
-    /* Stats row */
-    .post-stats {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 14px;
-    }
-    .stat-chip {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 12px;
-      color: var(--txt3);
-    }
-    .stat-chip svg {
-      width: 14px; height: 14px;
-      opacity: .7;
-    }
-
-    /* Progress bar */
-    .prog-wrap { margin-bottom: 12px }
-    .prog-label {
-      display: flex;
-      justify-content: space-between;
-      font-size: 11px;
-      color: var(--txt3);
-      margin-bottom: 6px;
-    }
-    .prog-label .pl-val { color: var(--acc); font-weight: 600 }
-    .prog-bar {
-      height: 5px;
-      background: var(--bg3);
-      border-radius: 3px;
-      overflow: hidden;
-    }
-    .prog-fill {
-      height: 100%;
-      border-radius: 3px;
-      background: linear-gradient(90deg, var(--acc), var(--acc3));
-      transition: width .5s cubic-bezier(.4,0,.2,1);
-    }
-    .prog-fill.done {
-      background: linear-gradient(90deg, var(--ok), #34d399);
-    }
-
-    /* Unlock button */
-    .unlock-btn {
-      width: 100%;
-      padding: 13px;
-      border-radius: var(--r2);
-      font-size: 14px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: all .2s;
-      letter-spacing: .3px;
-    }
-    .unlock-btn.locked {
-      background: linear-gradient(135deg, var(--acc), var(--acc2));
-      color: #fff;
-      box-shadow: 0 6px 20px var(--glow);
-    }
-    .unlock-btn.locked:hover { opacity:.9; box-shadow:0 8px 28px var(--glow) }
-    .unlock-btn.locked:active { transform:scale(.97) }
-    .unlock-btn.unlocked {
-      background: rgba(16,185,129,.12);
-      border: 1.5px solid rgba(16,185,129,.4);
-      color: var(--ok);
-      cursor: default;
-    }
-    .ucount {
-      background: rgba(255,255,255,.2);
-      border-radius: 8px;
-      padding: 2px 8px;
-      font-size: 12px;
-    }
-
-    .open-btn {
-      width: 100%;
-      margin-top: 10px;
-      padding: 13px;
-      border-radius: var(--r2);
-      background: linear-gradient(135deg, var(--ok), var(--ok2));
-      color: #fff;
-      font-size: 14px;
-      font-weight: 700;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: all .2s;
-      box-shadow: 0 6px 20px rgba(16,185,129,.3);
-    }
-    .open-btn.show { display:flex }
-    .open-btn:hover { opacity:.9 }
-    .open-btn:active { transform:scale(.97) }
-
-    /* ────────────────────────────────────────
-       SKELETON LOADER
-    ──────────────────────────────────────── */
-    .skel {
-      background: var(--card);
-      border: 1px solid var(--br);
-      border-radius: var(--r3);
-      overflow: hidden;
-    }
-    .skel-img { width:100%; aspect-ratio:16/9; background:var(--bg3); overflow:hidden; position:relative }
-    .skel-body { padding:14px }
-    .skel-line {
-      height: 13px;
-      border-radius: 7px;
-      background: var(--bg3);
-      margin-bottom: 10px;
-      position: relative;
-      overflow: hidden;
-    }
-    .skel-line.w80 { width:80% }
-    .skel-line.w60 { width:60% }
-    .skel-btn { height:44px; border-radius:var(--r2); background:var(--bg3); position:relative; overflow:hidden; margin-top:14px }
-    .skel-img::after,.skel-line::after,.skel-btn::after {
-      content:'';
-      position:absolute; inset:0;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,.04), transparent);
-      animation: shim 1.5s infinite;
-    }
-    @keyframes shim { from{transform:translateX(-100%)} to{transform:translateX(100%)} }
-
-    .spin-wrap { display:flex; justify-content:center; padding:24px }
-    .spin {
-      width:28px; height:28px;
-      border: 3px solid var(--br2);
-      border-top-color: var(--acc);
-      border-radius: 50%;
-      animation: spin .7s linear infinite;
-    }
-    @keyframes spin { to{transform:rotate(360deg)} }
-    .end-note {
-      text-align:center;
-      padding:24px;
-      color: var(--txt3);
-      font-size: 13px;
-    }
-
-    /* ────────────────────────────────────────
-       EMPTY STATE
-    ──────────────────────────────────────── */
-    .empty {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 60px 20px;
-      text-align: center;
-      gap: 12px;
-    }
-    .empty-ico { font-size: 60px }
-    .empty-ttl { font-size:17px; font-weight:700; color:var(--txt2) }
-    .empty-sub { font-size:13px; color:var(--txt3); line-height:1.6 }
-
-    /* ────────────────────────────────────────
-       AD MODAL (Unlock Flow)
-    ──────────────────────────────────────── */
-    .modal-ov {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,.9);
-      z-index: 1000;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      opacity: 0; pointer-events: none;
-      transition: opacity .3s;
-    }
-    .modal-ov.on { opacity:1; pointer-events:all }
-    .ad-modal {
-      width: 100%; max-width:480px;
-      background: var(--bg2);
-      border-radius: var(--r3) var(--r3) 0 0;
-      border-top: 1px solid var(--br2);
-      padding: 8px 20px 40px;
-      transform: translateY(100%);
-      transition: transform .4s cubic-bezier(.34,1.56,.64,1);
-    }
-    .modal-ov.on .ad-modal { transform:translateY(0) }
-
-    .modal-handle {
-      width: 36px; height: 4px;
-      background: var(--br2);
-      border-radius: 2px;
-      margin: 12px auto 20px;
-    }
-    .modal-head {
-      text-align: center;
-      margin-bottom: 28px;
-    }
-    .modal-ico {
-      font-size: 48px;
-      margin-bottom: 12px;
-      filter: drop-shadow(0 0 20px var(--glow));
-    }
-    .modal-title { font-size:20px; font-weight:700; margin-bottom:6px }
-    .modal-sub   { font-size:13px; color:var(--txt3); line-height:1.5 }
-
-    /* Step circles */
-    .ad-steps {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0;
-      margin-bottom: 28px;
-    }
-    .ad-step {
-      width: 44px; height: 44px;
-      border-radius: 50%;
-      border: 2px solid var(--br2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--txt3);
-      transition: all .35s;
-      background: var(--bg3);
-      position: relative;
-      z-index: 1;
-    }
-    .ad-step.done {
-      background: var(--ok);
-      border-color: var(--ok);
-      color: #fff;
-      box-shadow: 0 4px 14px rgba(16,185,129,.4);
-    }
-    .ad-step.active {
-      background: linear-gradient(135deg, var(--acc), #7c3aed);
-      border-color: var(--acc);
-      color: #fff;
-      box-shadow: 0 4px 20px var(--glow);
-      animation: stepPulse 1.4s ease infinite;
-    }
-    @keyframes stepPulse { 0%,100%{transform:scale(1)}50%{transform:scale(1.12)} }
-    .step-line {
-      flex: 1;
-      height: 2px;
-      background: var(--br2);
-      max-width: 32px;
-      transition: background .4s;
-    }
-    .step-line.done { background: var(--ok) }
-
-    /* Status area */
-    .ad-status {
-      text-align: center;
-      padding: 16px;
-      background: var(--bg3);
-      border-radius: var(--r);
-      margin-bottom: 20px;
-      min-height: 68px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .ad-status-txt { font-size:14px; color:var(--txt2); line-height:1.5 }
-    .ad-status-txt b { color:var(--txt); font-weight:700 }
-
-    /* Loading spinner inside status */
-    .ad-loading {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: var(--txt2);
-      font-size: 14px;
-    }
-    .ad-loading .spin { width:20px; height:20px; border-width:2px }
-
-    /* Main CTA button */
-    .ad-cta {
-      width: 100%;
-      padding: 15px;
-      border-radius: var(--r);
-      background: linear-gradient(135deg, var(--acc), #7c3aed);
-      color: #fff;
-      font-size: 16px;
-      font-weight: 700;
-      transition: all .2s;
-      box-shadow: 0 8px 28px var(--glow);
-      letter-spacing: .3px;
-    }
-    .ad-cta:disabled { opacity:.4; cursor:not-allowed; box-shadow:none }
-    .ad-cta:not(:disabled):hover { opacity:.9 }
-    .ad-cta:not(:disabled):active { transform:scale(.97) }
-    .ad-cta.success {
-      background: linear-gradient(135deg, var(--ok), var(--ok2));
-      box-shadow: 0 8px 28px rgba(16,185,129,.3);
-    }
-
-    .modal-close-row {
-      text-align: center;
-      margin-top: 14px;
-    }
-    .modal-close-row button {
-      background: transparent;
-      color: var(--txt3);
-      font-size: 13px;
-      padding: 8px 20px;
-    }
-    .modal-close-row button:hover { color:var(--txt2) }
-
-    /* ────────────────────────────────────────
-       TOAST
-    ──────────────────────────────────────── */
-    #toast-box {
-      position: fixed;
-      top: 16px; left: 50%;
-      transform: translateX(-50%);
-      z-index: 9998;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      pointer-events: none;
-      width: calc(100% - 32px);
-      max-width: 440px;
-    }
-    .toast {
-      padding: 12px 16px;
-      border-radius: var(--r2);
-      font-size: 13px;
-      font-weight: 500;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      backdrop-filter: blur(16px);
-      box-shadow: 0 4px 24px rgba(0,0,0,.5);
-      animation: tIn .3s ease;
-      pointer-events: all;
-    }
-    .toast.ok  { background:rgba(16,185,129,.15); border:1px solid rgba(16,185,129,.3); color:#34d399 }
-    .toast.err { background:rgba(239,68,68,.15);  border:1px solid rgba(239,68,68,.3);  color:#fca5a5 }
-    .toast.inf { background:rgba(99,102,241,.15); border:1px solid rgba(99,102,241,.3); color:#a5b4fc }
-    .toast.wrn { background:rgba(245,158,11,.15); border:1px solid rgba(245,158,11,.3); color:#fcd34d }
-    @keyframes tIn  { from{opacity:0;transform:translateY(-12px)} to{opacity:1;transform:translateY(0)} }
-    @keyframes tOut { from{opacity:1} to{opacity:0;transform:translateY(-12px)} }
-
-    /* ────────────────────────────────────────
-       BAN SCREEN
-    ──────────────────────────────────────── */
-    .ban-screen {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 40px 24px;
-      gap: 16px;
-    }
-    .ban-ico { font-size:72px }
-    .ban-ttl { font-size:22px; font-weight:800; color:var(--err) }
-    .ban-msg { font-size:14px; color:var(--txt3); line-height:1.7 }
-
-    /* ════════════════════════════════════════
-       ADMIN PANEL STYLES
-    ════════════════════════════════════════ */
-    #admin-app { display:none }
-
-    .adm-hdr {
-      background: var(--bg2);
-      border-bottom: 1px solid var(--br);
-      padding: 14px 16px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      position: sticky; top: 0; z-index: 100;
-    }
-    .adm-back {
-      width: 36px; height: 36px;
-      background: var(--bg3);
-      border: 1px solid var(--br);
-      border-radius: 10px;
-      display: flex; align-items:center; justify-content:center;
-      font-size: 18px;
-      color: var(--txt2);
-      cursor: pointer;
-      flex-shrink: 0;
-    }
-    .adm-ttl  { font-size:16px; font-weight:700; flex:1 }
-    .adm-badge {
-      font-size: 10px;
-      font-weight: 700;
-      background: linear-gradient(135deg, var(--acc), #7c3aed);
-      color: #fff;
-      padding: 4px 10px;
-      border-radius: 20px;
-    }
-
-    .adm-tabs {
-      background: var(--bg2);
-      border-bottom: 1px solid var(--br);
-      display: flex;
-      overflow-x: auto;
-      scrollbar-width: none;
-      position: sticky; top: 64px; z-index: 99;
-    }
-    .adm-tabs::-webkit-scrollbar { display:none }
-    .adm-tab-btn {
-      padding: 12px 16px;
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--txt3);
-      background: transparent;
-      border-bottom: 2px solid transparent;
-      white-space: nowrap;
-      flex-shrink: 0;
-      cursor: pointer;
-      transition: all .2s;
-    }
-    .adm-tab-btn.active { color:var(--acc); border-bottom-color:var(--acc) }
-    .adm-tab-btn:hover  { color:var(--txt2) }
-
-    .adm-pane { display:none; padding:16px }
-    .adm-pane.active { display:block }
-
-    /* Stats grid */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-    .stat-card {
-      background: var(--bg3);
-      border: 1px solid var(--br);
-      border-radius: var(--r);
-      padding: 16px 14px;
-    }
-    .sc-lbl { font-size:11px; color:var(--txt3); margin-bottom:8px }
-    .sc-val { font-size:24px; font-weight:800 }
-    .sc-val.acc  { color:var(--acc) }
-    .sc-val.ok   { color:var(--ok) }
-    .sc-val.info { color:var(--info) }
-    .sc-val.warn { color:var(--warn) }
-
-    /* Buttons */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 9px 16px;
-      border-radius: var(--r2);
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      border: none;
-      transition: all .2s;
-    }
-    .btn-pr { background:linear-gradient(135deg,var(--acc),var(--acc2)); color:#fff }
-    .btn-pr:hover { opacity:.9 }
-    .btn-ok { background:var(--ok); color:#fff }
-    .btn-ok:hover { background:var(--ok2) }
-    .btn-er { background:var(--err); color:#fff }
-    .btn-er:hover { background:#dc2626 }
-    .btn-gh {
-      background: var(--bg3);
-      color: var(--txt2);
-      border: 1px solid var(--br2);
-    }
-    .btn-gh:hover { background:var(--bg4) }
-    .btn-sm  { padding:6px 12px; font-size:12px }
-    .btn-ico { padding:7px }
-
-    /* Section header */
-    .sec-hdr {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 14px;
-    }
-    .sec-ttl { font-size:14px; font-weight:700 }
-
-    /* Search */
-    .search-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--bg3);
-      border: 1px solid var(--br);
-      border-radius: var(--r2);
-      padding: 10px 12px;
-      margin-bottom: 12px;
-    }
-    .search-row input {
-      flex: 1;
-      background: transparent;
-      color: var(--txt);
-      font-size: 13px;
-      border: none;
-    }
-    .search-row input::placeholder { color:var(--txt3) }
-
-    /* List items */
-    .adm-item {
-      background: var(--bg3);
-      border: 1px solid var(--br);
-      border-radius: var(--r);
-      padding: 12px;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .adm-thumb {
-      width: 50px; height: 40px;
-      border-radius: 8px;
-      background: var(--bg4);
-      overflow: hidden;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
-    }
-    .adm-thumb img { width:100%; height:100%; object-fit:cover }
-    .adm-info { flex:1; min-width:0 }
-    .adm-item-ttl {
-      font-size: 13px;
-      font-weight: 600;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      margin-bottom: 4px;
-    }
-    .adm-meta {
-      font-size: 11px;
-      color: var(--txt3);
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-    .adm-acts { display:flex; gap:6px; flex-shrink:0 }
-
-    /* Badge */
-    .badge {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 10px;
-      font-size: 10px;
-      font-weight: 700;
-    }
-    .bg { background:rgba(16,185,129,.15); color:var(--ok) }
-    .br { background:rgba(239,68,68,.15);  color:var(--err) }
-    .bw { background:rgba(245,158,11,.15); color:var(--warn) }
-    .bi { background:rgba(99,102,241,.15); color:var(--info) }
-
-    /* Form modal */
-    .fm-ov {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,.85);
-      z-index: 500;
-      display: flex; align-items:flex-end; justify-content:center;
-      opacity:0; pointer-events:none;
-      transition: opacity .25s;
-    }
-    .fm-ov.on { opacity:1; pointer-events:all }
-    .fm-box {
-      width: 100%; max-width:480px;
-      background: var(--bg2);
-      border-radius: 20px 20px 0 0;
-      border-top: 1px solid var(--br2);
-      padding: 8px 16px 40px;
-      max-height: 88vh;
-      overflow-y: auto;
-      transform: translateY(100%);
-      transition: transform .3s cubic-bezier(.34,1.56,.64,1);
-    }
-    .fm-ov.on .fm-box { transform:translateY(0) }
-    .fm-handle { width:36px; height:4px; background:var(--br2); border-radius:2px; margin:12px auto 16px }
-    .fm-ttl { font-size:16px; font-weight:700; margin-bottom:20px }
-    .fg { margin-bottom:14px }
-    .fl { font-size:12px; color:var(--txt2); margin-bottom:6px; display:block }
-    .fi,.fs,.fta {
-      width: 100%;
-      background: var(--bg3);
-      border: 1px solid var(--br);
-      border-radius: var(--r2);
-      padding: 11px 12px;
-      font-size: 14px;
-      color: var(--txt);
-      transition: border-color .2s;
-    }
-    .fi:focus,.fs:focus,.fta:focus { border-color:var(--acc) }
-    .fi::placeholder,.fta::placeholder { color:var(--txt3) }
-    .fs { appearance:none; cursor:pointer }
-    option { background:var(--bg2) }
-    .fta { resize:vertical; min-height:80px }
-    .frow { display:flex; gap:10px }
-    .frow .fg { flex:1 }
-    .fm-acts { display:flex; gap:10px; margin-top:20px }
-    .fm-acts .btn { flex:1; justify-content:center; padding:13px }
-
-    /* Toggle */
-    .tgl { position:relative; width:42px; height:24px; flex-shrink:0 }
-    .tgl input { opacity:0; width:0; height:0 }
-    .tgl-sl {
-      position: absolute; inset:0;
-      cursor: pointer;
-      background: var(--br2);
-      border-radius: 12px;
-      transition: .2s;
-    }
-    .tgl-sl::before {
-      content:'';
-      position:absolute;
-      height:18px; width:18px;
-      left:3px; bottom:3px;
-      background:#fff;
-      border-radius:50%;
-      transition:.2s;
-    }
-    input:checked+.tgl-sl { background:var(--acc) }
-    input:checked+.tgl-sl::before { transform:translateX(18px) }
-
-    /* Confirm dialog */
-    .cf-ov {
-      position:fixed; inset:0;
-      background:rgba(0,0,0,.85);
-      z-index:600;
-      display:flex; align-items:center; justify-content:center; padding:20px;
-      opacity:0; pointer-events:none;
-      transition:opacity .2s;
-    }
-    .cf-ov.on { opacity:1; pointer-events:all }
-    .cf-box {
-      width:100%; max-width:320px;
-      background: var(--bg2);
-      border-radius: 20px;
-      border: 1px solid var(--br2);
-      padding: 28px 20px;
-      text-align: center;
-      transform: scale(.88);
-      transition: transform .3s cubic-bezier(.34,1.56,.64,1);
-    }
-    .cf-ov.on .cf-box { transform:scale(1) }
-    .cf-ico { font-size:44px; margin-bottom:14px }
-    .cf-ttl { font-size:16px; font-weight:700; margin-bottom:8px }
-    .cf-msg { font-size:13px; color:var(--txt2); margin-bottom:22px; line-height:1.6 }
-    .cf-acts { display:flex; gap:10px }
-    .cf-acts .btn { flex:1; justify-content:center }
-
-    /* Settings */
-    .set-item {
-      background:var(--bg3);
-      border:1px solid var(--br);
-      border-radius:var(--r);
-      padding:14px;
-      margin-bottom:8px;
-      display:flex;
-      align-items:center;
-      gap:12px;
-    }
-    .set-info { flex:1 }
-    .set-lbl  { font-size:13px; font-weight:600; margin-bottom:3px }
-    .set-desc { font-size:11px; color:var(--txt3); line-height:1.4 }
-    .set-ctl  { flex-shrink:0; display:flex; gap:6px; align-items:center }
-
-    /* Chart */
-    .chart-card {
-      background:var(--bg3);
-      border:1px solid var(--br);
-      border-radius:var(--r);
-      padding:16px;
-      margin-bottom:14px;
-    }
-    .chart-ttl { font-size:12px; font-weight:600; margin-bottom:14px; color:var(--txt2) }
-    .bar-chart  { display:flex; align-items:flex-end; gap:6px; height:80px }
-    .bar-item   { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px }
-    .bar-fill   {
-      width:100%;
-      border-radius:4px 4px 0 0;
-      background:linear-gradient(180deg,var(--acc),var(--acc2));
-      min-height:4px;
-      transition:.5s;
-    }
-    .bar-lbl { font-size:9px; color:var(--txt3) }
-
-    /* Access denied */
-    .deny {
-      min-height:100vh;
-      display:flex; flex-direction:column; align-items:center; justify-content:center;
-      text-align:center;
-      padding:40px 24px; gap:14px;
-    }
-    .deny-ico { font-size:72px }
-    .deny-ttl { font-size:22px; font-weight:800; color:var(--err) }
-    .deny-msg { font-size:14px; color:var(--txt3); line-height:1.7 }
-  </style>
+  .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(80px);background:#111827;color:#fff;padding:12px 22px;border-radius:14px;font-size:14px;z-index:200;transition:transform .3s;max-width:90vw;text-align:center}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+</style>
 </head>
 <body>
 
-<!-- Toast -->
-<div id="toast-box"></div>
+<script>
+/* ================= CONFIG — এখানে আপনার তথ্য বসান ================= */
+const CONFIG = {
+  SUPABASE_URL: "https://https://ibkuwmizjehwxljkypru.supabase.co.supabase.co",            // যেমন: https://xxxx.supabase.co
+  SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlia3V3bWl6amVod3hsamt5cHJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ5NjUyNjYsImV4cCI6MjEwMDU0MTI2Nn0.wsygONI7Jq8JqtqRtXf2YtV0WUDU1JtU34V-1KTzbkU",  // Supabase → Settings → API → anon key
+  ADMIN_TELEGRAM_ID: "8717168026",  // আপনার টেলিগ্রাম আইডি (সংখ্যা), যেমন: "123456789"
+  MONETAG_ZONE_ID: "11394615",      // Monetag zone id, যেমন: "11394615"
+  ADS_REQUIRED: 3,                              // কয়টা এড দেখার পর লিংক খুলবে (৩ বা ৪)
+  ENABLE_INAPP_ADS: true                        // In-App Interstitial চালু/বন্ধ
+};
+/* ================================================================== */
+</script>
 
-<!-- ══════════════════════════════════════
-     MAIN APP
-══════════════════════════════════════ -->
-<div id="main-app">
-  <header class="header">
-    <div class="h-brand">
-      <div class="h-icon">💕</div>
-      <div>
-        <div class="h-title" id="app-title">Family Lover BD</div>
-        <div class="h-sub">বাংলাদেশের সেরা কন্টেন্ট</div>
+<header>
+  <div class="logo">▶</div>
+  <div class="brand">Family <span>Lover BD</span></div>
+  <div class="hbtns">
+    <button class="hbtn" onclick="toggleSearch()">🔍</button>
+    <button class="hbtn" onclick="toggleDark()">🌙</button>
+  </div>
+</header>
+
+<div class="searchbar" id="searchbar">
+  <input id="searchInput" placeholder="খুঁজুন..." oninput="render()" />
+</div>
+
+<div class="chips" id="chips"></div>
+
+<div id="trendingSection">
+  <div class="section-title"><div class="ico">🔥</div> Trending Now</div>
+  <div class="trow" id="trendingRow"></div>
+</div>
+
+<div class="section-title" style="margin-top:6px">Latest Videos</div>
+<div class="list" id="list"></div>
+<div class="empty" id="empty" style="display:none">কোনো পোস্ট পাওয়া যায়নি</div>
+
+<button class="admin-fab" id="adminFab" onclick="openAdmin()">＋</button>
+
+<!-- Unlock modal -->
+<div class="overlay" id="unlockOverlay">
+  <div class="modal">
+    <div class="unlock-box">
+      <div class="lockico">🔒</div>
+      <h2 id="unlockTitle">লিংক আনলক করুন</h2>
+      <p id="unlockText"></p>
+      <div class="dots" id="unlockDots"></div>
+      <button class="btn primary" style="width:100%" id="watchAdBtn" onclick="watchAd()">📺 এড দেখুন</button>
+      <button class="btn ghost" style="width:100%;margin-top:10px" onclick="closeOverlay('unlockOverlay')">বাতিল</button>
+    </div>
+  </div>
+</div>
+
+<!-- Admin panel -->
+<div class="overlay" id="adminOverlay">
+  <div class="modal">
+    <h2>⚙️ অ্যাডমিন প্যানেল</h2>
+    <div id="adminLogin" style="display:none">
+      <p style="font-size:13.5px;color:var(--muted);margin-bottom:6px">পোস্ট করার জন্য Supabase অ্যাডমিন লগইন করুন (একবারই লাগবে):</p>
+      <label>ইমেইল</label><input id="loginEmail" type="email" />
+      <label>পাসওয়ার্ড</label><input id="loginPass" type="password" />
+      <div class="btnrow"><button class="btn primary" onclick="adminLogin()">লগইন</button></div>
+    </div>
+    <div id="adminMain" style="display:none">
+      <div class="btnrow" style="margin:0 0 14px">
+        <button class="btn primary" onclick="openPostForm()">＋ নতুন পোস্ট</button>
+        <button class="btn ghost" onclick="openCatForm()">＋ ক্যাটাগরি</button>
       </div>
+      <h2 style="font-size:16px">সব পোস্ট</h2>
+      <div id="adminPosts"></div>
+      <h2 style="font-size:16px;margin-top:18px">ক্যাটাগরি</h2>
+      <div id="adminCats"></div>
     </div>
-    <div class="h-user">
-      <div class="h-avatar" id="user-avatar">U</div>
-      <div class="h-uname" id="user-name">লোড...</div>
-    </div>
-  </header>
-
-  <nav class="cat-wrap">
-    <div class="cat-scroll" id="cat-scroll"></div>
-  </nav>
-
-  <main>
-    <div class="feed" id="feed">
-      <!-- Skeleton shown instantly before JS loads -->
-      <div class="skel"><div class="skel-img"></div><div class="skel-body"><div class="skel-line w80"></div><div class="skel-line w60"></div><div class="skel-btn"></div></div></div>
-      <div class="skel"><div class="skel-img"></div><div class="skel-body"><div class="skel-line w80"></div><div class="skel-line w60"></div><div class="skel-btn"></div></div></div>
-      <div class="skel"><div class="skel-img"></div><div class="skel-body"><div class="skel-line w80"></div><div class="skel-line w60"></div><div class="skel-btn"></div></div></div>
-    </div>
-    <div class="spin-wrap" id="load-spinner" style="display:none">
-      <div class="spin"></div>
-    </div>
-  </main>
+    <div class="btnrow"><button class="btn ghost" onclick="closeOverlay('adminOverlay')">বন্ধ করুন</button></div>
+  </div>
 </div>
 
-<!-- ══════════════════════════════════════
-     ADMIN APP
-══════════════════════════════════════ -->
-<div id="admin-app">
-
-  <div id="access-denied" style="display:none" class="deny">
-    <div class="deny-ico">🚫</div>
-    <div class="deny-ttl">অ্যাক্সেস নেই</div>
-    <div class="deny-msg">এই পেজটি শুধুমাত্র অ্যাডমিনের জন্য।<br>আপনার Telegram ID অনুমোদিত নয়।</div>
+<!-- Post form -->
+<div class="overlay" id="postOverlay">
+  <div class="modal">
+    <h2 id="postFormTitle">নতুন পোস্ট</h2>
+    <input type="hidden" id="pfId" />
+    <label>শিরোনাম *</label><input id="pfTitle" placeholder="যেমন: মজার ভিডিও - বিয়ে বাড়ির কাণ্ড" />
+    <label>বর্ণনা</label><textarea id="pfDesc" placeholder="ভিডিওর সংক্ষিপ্ত বর্ণনা ও সোর্স"></textarea>
+    <label>থাম্বনেইল ছবির URL</label><input id="pfThumb" placeholder="https://..." />
+    <label>মূল লিংক (আনলকের পর যেখানে যাবে) *</label><input id="pfLink" placeholder="https://..." />
+    <label>ক্যাটাগরি</label><select id="pfCat"></select>
+    <label>ট্রেন্ডিং?</label>
+    <select id="pfTrending"><option value="false">না</option><option value="true">হ্যাঁ</option></select>
+    <label>Views (শুরুর সংখ্যা)</label><input id="pfViews" type="number" value="0" />
+    <label>Downloads (শুরুর সংখ্যা)</label><input id="pfDls" type="number" value="0" />
+    <div class="btnrow">
+      <button class="btn ghost" onclick="closeOverlay('postOverlay')">বাতিল</button>
+      <button class="btn primary" onclick="savePost()">সেভ করুন</button>
+    </div>
   </div>
-
-  <div id="adm-inner" style="display:none">
-    <header class="adm-hdr">
-      <div class="adm-back" onclick="goHome()">←</div>
-      <div class="adm-ttl">Admin Panel</div>
-      <div class="adm-badge">ADMIN</div>
-    </header>
-
-    <nav class="adm-tabs">
-      <button class="adm-tab-btn" data-tab="dashboard"  onclick="admTab('dashboard')">📊 ড্যাশবোর্ড</button>
-      <button class="adm-tab-btn" data-tab="categories" onclick="admTab('categories')">📁 ক্যাটাগরি</button>
-      <button class="adm-tab-btn" data-tab="posts"      onclick="admTab('posts')">📝 পোস্ট</button>
-      <button class="adm-tab-btn" data-tab="users"      onclick="admTab('users')">👥 ইউজার</button>
-      <button class="adm-tab-btn" data-tab="stats"      onclick="admTab('stats')">📈 স্ট্যাটস</button>
-      <button class="adm-tab-btn" data-tab="settings"   onclick="admTab('settings')">⚙️ সেটিংস</button>
-    </nav>
-
-    <div class="adm-pane" id="pane-dashboard"></div>
-    <div class="adm-pane" id="pane-categories"></div>
-    <div class="adm-pane" id="pane-posts"></div>
-    <div class="adm-pane" id="pane-users"></div>
-    <div class="adm-pane" id="pane-stats"></div>
-    <div class="adm-pane" id="pane-settings"></div>
-  </div>
-
 </div>
 
-<!-- ══════════════════════════════════════
-     JAVASCRIPT
-══════════════════════════════════════ -->
-<script type="module">
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+<!-- Category form -->
+<div class="overlay" id="catOverlay">
+  <div class="modal">
+    <h2>নতুন ক্যাটাগরি</h2>
+    <label>নাম *</label><input id="cfName" placeholder="যেমন: Hot 🥵, Trending🔥, Funny 😂" />
+    <div class="btnrow">
+      <button class="btn ghost" onclick="closeOverlay('catOverlay')">বাতিল</button>
+      <button class="btn primary" onclick="saveCat()">সেভ করুন</button>
+    </div>
+  </div>
+</div>
 
-/* ─── Supabase ──────────────────────────────────────────────────── */
-const C  = APP_CONFIG;
-const sb = createClient(C.SUPABASE_URL, C.SUPABASE_ANON_KEY, { auth:{ persistSession:false } });
+<div class="toast" id="toast"></div>
 
-/* ─── Telegram ──────────────────────────────────────────────────── */
+<script>
+/* ---------- Telegram init ---------- */
 const tg = window.Telegram?.WebApp;
-function tgInit(){
-  if(!tg) return;
-  tg.ready(); tg.expand();
-  tg.setHeaderColor('#090912');
-  tg.setBackgroundColor('#090912');
-}
-function tgUser(){
-  if(tg?.initDataUnsafe?.user){
-    const u=tg.initDataUnsafe.user;
-    return{ id:u.id, username:u.username||null, firstName:u.first_name||'User' };
-  }
-  return{ id:null, username:'guest', firstName:'Guest' };
-}
-function tgOpen(url){ tg ? tg.openLink(url) : window.open(url,'_blank') }
-function tgHaptic(t='light'){
-  if(!tg?.HapticFeedback) return;
-  if(['error','success','warning'].includes(t)) tg.HapticFeedback.notificationOccurred(t);
-  else tg.HapticFeedback.impactOccurred(t);
-}
+if (tg) { tg.ready(); tg.expand(); }
+const tgUserId = String(tg?.initDataUnsafe?.user?.id || "");
 
-/* ─── Monetag ───────────────────────────────────────────────────── */
-let monetagLoaded = false;
-function loadMonetagScript(zoneId){
-  if(!zoneId || monetagLoaded) return;
-  monetagLoaded = true;
-  const s = document.createElement('script');
-  // Monetag Rewarded Interstitial script
-  s.src = `https://glimtaboarsal.com/act/files/tag.min.js?z=${zoneId}`;
-  s.async = true;
-  s.onerror = () => { monetagLoaded = false; }; // allow retry
+/* ---------- Supabase ---------- */
+const DEMO = CONFIG.SUPABASE_URL.startsWith("YOUR_");
+let sb = null;
+if (!DEMO) sb = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+
+/* ---------- Monetag SDK loader ---------- */
+let adFn = null;
+if (!String(CONFIG.MONETAG_ZONE_ID).startsWith("YOUR_")) {
+  const s = document.createElement("script");
+  s.src = "https://libtl.com/sdk.js";
+  s.dataset.zone = CONFIG.MONETAG_ZONE_ID;
+  s.dataset.sdk = "show_" + CONFIG.MONETAG_ZONE_ID;
+  s.onload = () => {
+    adFn = window["show_" + CONFIG.MONETAG_ZONE_ID];
+    // In-App Interstitial (স্বয়ংক্রিয় এড)
+    if (CONFIG.ENABLE_INAPP_ADS && adFn) {
+      adFn({ type: "inApp", inAppSettings: { frequency: 2, capping: 0.1, interval: 30, timeout: 5, everyPage: false } });
+    }
+  };
   document.head.appendChild(s);
 }
 
-/**
- * Show one Monetag Rewarded Interstitial ad.
- * Returns a Promise that resolves when the user finishes watching.
- * Falls back to a short delay if the SDK isn't available (dev/test mode).
- */
-function showMonetagAd(){
-  return new Promise((resolve, reject) => {
-    const zoneId = C.MONETAG_ZONE_ID;
-    if(!zoneId){
-      // No zone ID configured — simulate for testing
-      setTimeout(resolve, 2000);
-      return;
-    }
-    const fnName = 'show_' + zoneId;
-    if(typeof window[fnName] === 'function'){
-      // Rewarded Interstitial — promise resolves when ad is watched
-      window[fnName]().then(resolve).catch(reject);
-    } else {
-      // SDK not ready yet — wait up to 5s then try again
-      let waited = 0;
-      const poll = setInterval(()=>{
-        waited += 200;
-        if(typeof window[fnName] === 'function'){
-          clearInterval(poll);
-          window[fnName]().then(resolve).catch(reject);
-        } else if(waited >= 5000){
-          clearInterval(poll);
-          // Fallback: assume watched after timeout
-          resolve();
-        }
-      }, 200);
-    }
-  });
-}
+/* ---------- State ---------- */
+let posts = [], cats = [], activeCat = "all", currentUnlockPost = null;
+const demoData = () => {
+  posts = [
+    { id: 1, title: "ডেমো পোস্ট ১ (৮ মিনিট ২১ সেকেন্ড)", description: "এটি একটি ডেমো পোস্ট — Supabase কানেক্ট করলে আসল ডাটা দেখাবে।", thumbnail_url: "", link_url: "https://example.com", category_id: null, is_trending: true, views: 22100, downloads: 40500 },
+    { id: 2, title: "ডেমো পোস্ট ২ (৩ ভিডিও)", description: "ডেমো বর্ণনা।", thumbnail_url: "", link_url: "https://example.com", category_id: null, is_trending: false, views: 137, downloads: 168 }
+  ];
+  cats = [{ id: 1, name: "Hot 🥵" }, { id: 2, name: "Trending🔥" }];
+};
 
-/* ─── Toast ─────────────────────────────────────────────────────── */
-const TICO = { ok:'✅', err:'❌', inf:'ℹ️', wrn:'⚠️' };
-function toast(msg, type='inf', dur=3200){
-  const box = document.getElementById('toast-box');
-  const el  = document.createElement('div');
-  el.className = `toast ${type}`;
-  el.innerHTML = `<span>${TICO[type]||'ℹ️'}</span><span>${msg}</span>`;
-  box.appendChild(el);
-  setTimeout(()=>{
-    el.style.animation='tOut .3s ease forwards';
-    setTimeout(()=>el.remove(), 300);
-  }, dur);
-}
-
-/* ─── Helpers ───────────────────────────────────────────────────── */
-function esc(s){ if(!s)return''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') }
-function fmtN(n){ n=Number(n)||0; if(n>=1e6)return(n/1e6).toFixed(1)+'M'; if(n>=1e3)return(n/1e3).toFixed(1)+'K'; return String(n) }
-function dateStr(s){ try{ return new Date(s).toLocaleDateString('bn-BD') }catch{ return '' } }
-
-/* ─── Routing ───────────────────────────────────────────────────── */
-const isAdmin = window.location.pathname.includes('/admin') || window.location.hash === '#admin';
-
-/* ══════════════════════════════════════════════════════════════════
-   SUPABASE HELPERS
-══════════════════════════════════════════════════════════════════ */
-async function upsertUser(id, username, firstName){
-  const {data,error} = await sb.from('users').upsert(
-    { telegram_id:id, username, first_name:firstName, last_seen:new Date().toISOString() },
-    { onConflict:'telegram_id' }
-  ).select().single();
-  if(error) throw error;
-  return data;
-}
-async function getCategories(enabledOnly=true){
-  let q = sb.from('categories').select('*').order('sort_order');
-  if(enabledOnly) q = q.eq('is_enabled',true);
-  const {data,error} = await q;
-  if(error) throw error;
-  return data||[];
-}
-async function getPosts({ catId=null, page=0, limit=C.ITEMS_PER_PAGE }={}){
-  let q = sb.from('posts')
-    .select('id,title,thumbnail,target_url,is_enabled,views,downloads,created_at,categories(id,name,icon)')
-    .eq('is_enabled',true)
-    .order('created_at',{ascending:false})
-    .range(page*limit, (page+1)*limit-1);
-  if(catId) q = q.eq('category_id',catId);
-  const {data,error} = await q;
-  if(error) throw error;
-  return data||[];
-}
-async function getAllPosts({ search='', catId='', page=0, limit=20 }={}){
-  let q = sb.from('posts')
-    .select('id,title,thumbnail,target_url,category_id,is_enabled,views,downloads,created_at,categories(id,name,icon)')
-    .order('created_at',{ascending:false})
-    .range(page*limit, (page+1)*limit-1);
-  if(search) q = q.ilike('title',`%${search}%`);
-  if(catId)  q = q.eq('category_id',catId);
-  const {data,error} = await q;
-  if(error) throw error;
-  return data||[];
-}
-async function incView(id){
-  await sb.rpc('increment_views', { row_id: id }).catch(async()=>{
-    const {data} = await sb.from('posts').select('views').eq('id',id).single();
-    if(data) await sb.from('posts').update({views:(data.views||0)+1}).eq('id',id);
-  });
-}
-async function incDl(id){
-  const {data} = await sb.from('posts').select('downloads').eq('id',id).single();
-  if(data) await sb.from('posts').update({downloads:(data.downloads||0)+1}).eq('id',id);
-}
-async function getProgress(telegramId, postId){
-  const {data,error} = await sb.from('ad_watches').select('*')
-    .eq('user_telegram_id',telegramId).eq('post_id',postId).single();
-  if(error && error.code!=='PGRST116') throw error;
-  return data;
-}
-async function getBulkProgress(telegramId, postIds){
-  if(!postIds.length) return [];
-  const {data,error} = await sb.from('ad_watches').select('*')
-    .eq('user_telegram_id',telegramId).in('post_id',postIds);
-  if(error) throw error;
-  return data||[];
-}
-async function updateProgress(telegramId, postId, count, required){
-  const unlocked = count >= required;
-  const {data,error} = await sb.from('ad_watches').upsert(
-    { user_telegram_id:telegramId, post_id:postId, watch_count:count,
-      is_unlocked:unlocked, unlocked_at:unlocked?new Date().toISOString():null },
-    { onConflict:'user_telegram_id,post_id' }
-  ).select().single();
-  if(error) throw error;
-  return data;
-}
-async function getSettings(){
-  const {data,error} = await sb.from('settings').select('key,value');
-  if(error) throw error;
-  const m={};
-  (data||[]).forEach(s=>m[s.key]=s.value);
-  return m;
-}
-async function updSetting(key,value){
-  const {error} = await sb.from('settings').upsert({key,value,updated_at:new Date().toISOString()});
-  if(error) throw error;
-}
-async function getAdminStats(){
-  const [posts,cats,users,unlocks] = await Promise.all([
-    sb.from('posts').select('id,views,downloads'),
-    sb.from('categories').select('id',{count:'exact',head:true}),
-    sb.from('users').select('id',{count:'exact',head:true}),
-    sb.from('ad_watches').select('id',{count:'exact',head:true}).eq('is_unlocked',true),
+async function loadData() {
+  if (DEMO) { demoData(); render(); return; }
+  const [p, c] = await Promise.all([
+    sb.from("posts").select("*").order("created_at", { ascending: false }),
+    sb.from("categories").select("*").order("id")
   ]);
-  const totalViews = (posts.data||[]).reduce((s,p)=>s+(p.views||0),0);
-  const totalDl    = (posts.data||[]).reduce((s,p)=>s+(p.downloads||0),0);
-  return {
-    posts:(posts.data||[]).length, categories:cats.count||0,
-    users:users.count||0, unlocks:unlocks.count||0,
-    totalViews, totalDownloads:totalDl
+  if (p.error || c.error) { showToast("ডাটা লোডে সমস্যা: " + (p.error || c.error).message); return; }
+  posts = p.data; cats = c.data; render();
+}
+
+/* ---------- Helpers ---------- */
+const fmt = n => n >= 1000 ? (n / 1000).toFixed(1).replace(/\.0$/, "") + "k" : String(n);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
+function showToast(m) { const t = document.getElementById("toast"); t.textContent = m; t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 2600); }
+function closeOverlay(id) { document.getElementById(id).classList.remove("show"); }
+function toggleSearch() { document.getElementById("searchbar").classList.toggle("show"); }
+function toggleDark() { document.body.classList.toggle("dark"); }
+
+/* ---------- Render ---------- */
+function render() {
+  // chips
+  const chipsEl = document.getElementById("chips");
+  chipsEl.innerHTML = `<div class="chip ${activeCat === "all" ? "active" : ""}" onclick="setCat('all')">All Videos</div>` +
+    cats.map(c => `<div class="chip ${activeCat == c.id ? "active" : ""}" onclick="setCat(${c.id})">${esc(c.name)}</div>`).join("");
+
+  const q = (document.getElementById("searchInput").value || "").toLowerCase();
+  const filtered = posts.filter(p =>
+    (activeCat === "all" || p.category_id == activeCat) &&
+    (!q || (p.title || "").toLowerCase().includes(q)));
+
+  // trending
+  const trending = filtered.filter(p => p.is_trending);
+  document.getElementById("trendingSection").style.display = trending.length ? "" : "none";
+  document.getElementById("trendingRow").innerHTML = trending.map((p, i) => cardHTML(p, i + 1)).join("");
+
+  // latest
+  const listEl = document.getElementById("list");
+  listEl.innerHTML = filtered.map(p => cardHTML(p)).join("");
+  document.getElementById("empty").style.display = filtered.length ? "none" : "";
+
+  // admin fab
+  const isAdmin = tgUserId && tgUserId === String(CONFIG.ADMIN_TELEGRAM_ID) || new URLSearchParams(location.search).get("admin") === "1";
+  document.getElementById("adminFab").style.display = isAdmin ? "block" : "none";
+}
+function setCat(id) { activeCat = id; render(); }
+
+function cardHTML(p, topRank) {
+  const prog = getProgress(p.id);
+  const unlocked = prog >= CONFIG.ADS_REQUIRED;
+  const thumb = p.thumbnail_url
+    ? `<img src="${esc(p.thumbnail_url)}" loading="lazy" onerror="this.outerHTML='<div class=thumb-ph>🎬</div>'" />`
+    : `<div class="thumb-ph">🎬</div>`;
+  return `<div class="card">
+    <div class="thumbwrap">${thumb}
+      ${topRank ? `<div class="badge-top">🔥 Top ${topRank}</div>` : ""}
+      <div class="playbtn">▶</div>
+      <div class="stat views">👁 ${fmt(p.views || 0)}</div>
+      <div class="stat dls">⬇ ${fmt(p.downloads || 0)}</div>
+    </div>
+    <h3>${esc(p.title)}</h3>
+    ${p.description ? `<div class="desc">${esc(p.description)}</div>` : ""}
+    <button class="cta ${unlocked ? "done" : ""}" onclick="startUnlock(${p.id})">
+      ${unlocked ? "✅ Watch & Download" : `🔒 Unlock Link (${prog}/${CONFIG.ADS_REQUIRED})`}
+    </button>
+  </div>`;
+}
+
+/* ---------- Unlock flow ---------- */
+const getProgress = id => Number(localStorage.getItem("unlock_" + id) || 0);
+const setProgress = (id, v) => localStorage.setItem("unlock_" + id, String(v));
+
+function startUnlock(id) {
+  const p = posts.find(x => x.id == id);
+  if (!p) return;
+  currentUnlockPost = p;
+  if (getProgress(id) >= CONFIG.ADS_REQUIRED) { goToLink(p); return; }
+  updateUnlockModal();
+  document.getElementById("unlockOverlay").classList.add("show");
+}
+
+function updateUnlockModal() {
+  const p = currentUnlockPost, prog = getProgress(p.id);
+  document.getElementById("unlockTitle").textContent = prog >= CONFIG.ADS_REQUIRED ? "🎉 আনলক সম্পন্ন!" : "লিংক আনলক করুন";
+  document.getElementById("unlockText").textContent =
+    prog >= CONFIG.ADS_REQUIRED
+      ? "লিংক খোলা হচ্ছে..."
+      : `লিংকটি পেতে ${CONFIG.ADS_REQUIRED}টি এড দেখুন। আর ${CONFIG.ADS_REQUIRED - prog}টি বাকি।`;
+  document.getElementById("unlockDots").innerHTML =
+    Array.from({ length: CONFIG.ADS_REQUIRED }, (_, i) => `<div class="dot ${i < prog ? "on" : ""}"></div>`).join("");
+  document.getElementById("watchAdBtn").style.display = prog >= CONFIG.ADS_REQUIRED ? "none" : "";
+}
+
+function watchAd() {
+  const btn = document.getElementById("watchAdBtn");
+  btn.disabled = true; btn.textContent = "এড লোড হচ্ছে...";
+  const after = () => {
+    btn.disabled = false; btn.textContent = "📺 এড দেখুন";
+    const p = currentUnlockPost;
+    setProgress(p.id, getProgress(p.id) + 1);
+    updateUnlockModal(); render();
+    if (getProgress(p.id) >= CONFIG.ADS_REQUIRED) setTimeout(() => goToLink(p), 800);
   };
-}
-async function createCat(d){  const{data,error}=await sb.from('categories').insert(d).select().single(); if(error)throw error; return data }
-async function updateCat(id,d){ const{data,error}=await sb.from('categories').update(d).eq('id',id).select().single(); if(error)throw error; return data }
-async function deleteCat(id,moveTo=null){
-  if(moveTo) await sb.from('posts').update({category_id:moveTo}).eq('category_id',id);
-  else       await sb.from('posts').update({category_id:null}).eq('category_id',id);
-  const{error}=await sb.from('categories').delete().eq('id',id); if(error)throw error;
-}
-async function createPost(d){ const{data,error}=await sb.from('posts').insert(d).select().single(); if(error)throw error; return data }
-async function updatePost(id,d){ const{data,error}=await sb.from('posts').update(d).eq('id',id).select().single(); if(error)throw error; return data }
-async function deletePost(id){ const{error}=await sb.from('posts').delete().eq('id',id); if(error)throw error }
-async function resetStat(id,field){ const u={}; u[field]=0; const{error}=await sb.from('posts').update(u).eq('id',id); if(error)throw error }
-async function getUsers({search='',page=0}={}){
-  let q=sb.from('users').select('*').order('created_at',{ascending:false}).range(page*20,(page+1)*20-1);
-  if(search) q=q.or(`first_name.ilike.%${search}%,username.ilike.%${search}%`);
-  const{data,error}=await q; if(error)throw error; return data||[];
-}
-async function banUser(id,reason=''){  const{error}=await sb.from('users').update({is_banned:true,ban_reason:reason}).eq('telegram_id',id); if(error)throw error }
-async function unbanUser(id){          const{error}=await sb.from('users').update({is_banned:false,ban_reason:null}).eq('telegram_id',id); if(error)throw error }
-async function resetProgress(id){      const{error}=await sb.from('ad_watches').delete().eq('user_telegram_id',id); if(error)throw error }
-async function getDailyStats(days=7){
-  const from=new Date(); from.setDate(from.getDate()-days);
-  const{data,error}=await sb.from('downloads').select('downloaded_at').gte('downloaded_at',from.toISOString());
-  if(error)throw error; return data||[];
-}
-
-/* ══════════════════════════════════════════════════════════════════
-   AD UNLOCK MODAL
-   — Uses Monetag Rewarded Interstitial: show_ZONEID().then(reward)
-══════════════════════════════════════════════════════════════════ */
-let adBusy = false;
-
-async function openAdModal({ postId, telegramId, required, onProgress, onUnlocked }){
-  if(adBusy) return;
-  adBusy = true;
-
-  let prog  = await getProgress(telegramId, postId);
-  let count = prog?.watch_count || 0;
-
-  if(prog?.is_unlocked){ adBusy=false; onUnlocked?.(); return; }
-
-  /* Build modal DOM */
-  const ov = document.createElement('div');
-  ov.className = 'modal-ov';
-  ov.id = 'ad-modal-ov';
-  ov.innerHTML = buildModalHTML(count, required);
-  document.body.appendChild(ov);
-  requestAnimationFrame(()=>ov.classList.add('on'));
-
-  const btn    = document.getElementById('am-cta');
-  const status = document.getElementById('am-status');
-
-  function closeModal(){
-    ov.classList.remove('on');
-    setTimeout(()=>{ ov.remove(); adBusy=false; }, 380);
+  if (adFn) {
+    // Rewarded interstitial — এড শেষ হলে প্রগ্রেস বাড়বে
+    adFn().then(after).catch(() => { btn.disabled = false; btn.textContent = "📺 এড দেখুন"; showToast("এড লোড হয়নি, আবার চেষ্টা করুন"); });
+  } else {
+    showToast("ডেমো মোড: Monetag zone id বসালে আসল এড দেখাবে");
+    setTimeout(after, 800);
   }
-  document.getElementById('am-close').addEventListener('click', closeModal);
-  ov.addEventListener('click', e=>{ if(e.target===ov) closeModal(); });
+}
 
-  function renderSteps(c){
-    let h='';
-    for(let i=0;i<required;i++){
-      if(i>0) h+=`<div class="step-line${i<=c?' done':''}"></div>`;
-      const cls = i<c?'done':i===c?'active':'';
-      h+=`<div class="ad-step ${cls}">${i<c?'✓':i+1}</div>`;
-    }
-    document.getElementById('am-steps').innerHTML=h;
-  }
-  function setStatus(html){ status.innerHTML=html; }
+async function goToLink(p) {
+  closeOverlay("unlockOverlay");
+  if (!DEMO) sb.rpc("increment_downloads", { post_id: p.id }).then(() => {});
+  p.downloads = (p.downloads || 0) + 1; render();
+  if (tg?.openLink) tg.openLink(p.link_url); else window.open(p.link_url, "_blank");
+}
 
-  renderSteps(count);
-  setStatus(`<div class="ad-status-txt">বিজ্ঞাপন দেখুন এবং <b>${count+1}/${required}</b> ধাপ সম্পন্ন করুন</div>`);
+/* ---------- Views count (once per session per post) ---------- */
+const counted = new Set();
+document.addEventListener("click", e => {
+  const card = e.target.closest(".card"); if (!card) return;
+}, true);
 
-  btn.addEventListener('click', async()=>{
-    if(btn.disabled) return;
-    btn.disabled = true;
-    btn.textContent = 'বিজ্ঞাপন লোড হচ্ছে...';
-    setStatus(`<div class="ad-loading"><div class="spin"></div> <span>বিজ্ঞাপন খুলছে — দেখুন এবং বন্ধ করুন...</span></div>`);
-    tgHaptic('medium');
-
-    try {
-      // ✅ Correct Monetag Rewarded Interstitial API
-      // Promise resolves ONLY after user watches the ad
-      await showMonetagAd();
-
-      // — Ad watched successfully —
-      tgHaptic('success');
-      count++;
-      const nowUnlocked = count >= required;
-
-      try {
-        await updateProgress(telegramId, postId, count, required);
-        onProgress?.(count);
-      } catch(e){
-        toast('প্রগ্রেস সেভ সমস্যা','wrn');
-      }
-
-      renderSteps(count);
-
-      if(nowUnlocked){
-        btn.textContent = '🎉 সম্পন্ন হয়েছে!';
-        btn.classList.add('success');
-        btn.disabled = true;
-        setStatus(`<div class="ad-status-txt">🎉 <b>আনলক হয়ে গেছে!</b><br>এখন লিংক খুলতে পারবেন।</div>`);
-        toast('🎉 লিংক আনলক হয়েছে!','ok');
-        setTimeout(()=>{ closeModal(); onUnlocked?.(); }, 1600);
-      } else {
-        const remaining = required - count;
-        setStatus(`<div class="ad-status-txt">✅ ${count}/${required} সম্পন্ন। আরো <b>${remaining}টি</b> বিজ্ঞাপন দেখুন।</div>`);
-        toast(`✅ ${count}/${required} — আর ${remaining}টি বাকি`,'inf');
-        btn.disabled = false;
-        btn.textContent = `বিজ্ঞাপন দেখুন (${count+1}/${required})`;
-      }
-
-    } catch(err) {
-      // Ad was skipped or failed
-      console.warn('Ad skipped/failed', err);
-      tgHaptic('error');
-      setStatus(`<div class="ad-status-txt">⚠️ বিজ্ঞাপন সম্পন্ন করুন — স্কিপ করলে কাজ হবে না।</div>`);
-      toast('বিজ্ঞাপন সম্পন্ন করুন','wrn');
-      btn.disabled = false;
-      btn.textContent = `আবার চেষ্টা করুন (${count+1}/${required})`;
-    }
+/* ---------- Admin ---------- */
+async function openAdmin() {
+  document.getElementById("adminOverlay").classList.add("show");
+  if (DEMO) { document.getElementById("adminMain").style.display = ""; renderAdmin(); return; }
+  const { data } = await sb.auth.getSession();
+  if (data.session) { document.getElementById("adminMain").style.display = ""; document.getElementById("adminLogin").style.display = "none"; renderAdmin(); }
+  else { document.getElementById("adminLogin").style.display = ""; document.getElementById("adminMain").style.display = "none"; }
+}
+async function adminLogin() {
+  const { error } = await sb.auth.signInWithPassword({
+    email: document.getElementById("loginEmail").value.trim(),
+    password: document.getElementById("loginPass").value
   });
+  if (error) { showToast("লগইন ব্যর্থ: " + error.message); return; }
+  showToast("লগইন সফল ✅"); openAdmin();
+}
+function renderAdmin() {
+  document.getElementById("adminPosts").innerHTML = posts.map(p =>
+    `<div class="admin-list-item"><div class="t">${esc(p.title)}</div>
+      <button class="mini edit" onclick="openPostForm(${p.id})">এডিট</button>
+      <button class="mini del" onclick="deletePost(${p.id})">ডিলিট</button></div>`).join("") || "<div class='empty'>কোনো পোস্ট নেই</div>";
+  document.getElementById("adminCats").innerHTML = cats.map(c =>
+    `<div class="admin-list-item"><div class="t">${esc(c.name)}</div>
+      <button class="mini del" onclick="deleteCat(${c.id})">ডিলিট</button></div>`).join("") || "<div class='empty'>কোনো ক্যাটাগরি নেই</div>";
+}
+function openPostForm(id) {
+  const p = id ? posts.find(x => x.id == id) : null;
+  document.getElementById("postFormTitle").textContent = p ? "পোস্ট এডিট" : "নতুন পোস্ট";
+  document.getElementById("pfId").value = p ? p.id : "";
+  document.getElementById("pfTitle").value = p?.title || "";
+  document.getElementById("pfDesc").value = p?.description || "";
+  document.getElementById("pfThumb").value = p?.thumbnail_url || "";
+  document.getElementById("pfLink").value = p?.link_url || "";
+  document.getElementById("pfTrending").value = String(p?.is_trending || false);
+  document.getElementById("pfViews").value = p?.views || 0;
+  document.getElementById("pfDls").value = p?.downloads || 0;
+  document.getElementById("pfCat").innerHTML = `<option value="">— নেই —</option>` +
+    cats.map(c => `<option value="${c.id}" ${p?.category_id == c.id ? "selected" : ""}>${esc(c.name)}</option>`).join("");
+  document.getElementById("postOverlay").classList.add("show");
+}
+async function savePost() {
+  const id = document.getElementById("pfId").value;
+  const row = {
+    title: document.getElementById("pfTitle").value.trim(),
+    description: document.getElementById("pfDesc").value.trim(),
+    thumbnail_url: document.getElementById("pfThumb").value.trim(),
+    link_url: document.getElementById("pfLink").value.trim(),
+    category_id: document.getElementById("pfCat").value || null,
+    is_trending: document.getElementById("pfTrending").value === "true",
+    views: Number(document.getElementById("pfViews").value || 0),
+    downloads: Number(document.getElementById("pfDls").value || 0)
+  };
+  if (!row.title || !row.link_url) { showToast("শিরোনাম ও লিংক আবশ্যক"); return; }
+  if (DEMO) { showToast("ডেমো মোড: Supabase কানেক্ট করুন"); return; }
+  const q = id ? sb.from("posts").update(row).eq("id", id) : sb.from("posts").insert(row);
+  const { error } = await q;
+  if (error) { showToast("সেভ ব্যর্থ: " + error.message); return; }
+  showToast("সেভ হয়েছে ✅"); closeOverlay("postOverlay"); await loadData(); renderAdmin();
+}
+async function deletePost(id) {
+  if (!confirm("পোস্টটি ডিলিট করবেন?")) return;
+  if (DEMO) { showToast("ডেমো মোড"); return; }
+  const { error } = await sb.from("posts").delete().eq("id", id);
+  if (error) { showToast("ডিলিট ব্যর্থ: " + error.message); return; }
+  await loadData(); renderAdmin();
+}
+function openCatForm() { document.getElementById("cfName").value = ""; document.getElementById("catOverlay").classList.add("show"); }
+async function saveCat() {
+  const name = document.getElementById("cfName").value.trim();
+  if (!name) return;
+  if (DEMO) { showToast("ডেমো মোড"); return; }
+  const { error } = await sb.from("categories").insert({ name });
+  if (error) { showToast("সেভ ব্যর্থ: " + error.message); return; }
+  closeOverlay("catOverlay"); await loadData(); renderAdmin();
+}
+async function deleteCat(id) {
+  if (!confirm("ক্যাটাগরিটি ডিলিট করবেন?")) return;
+  if (DEMO) { showToast("ডেমো মোড"); return; }
+  const { error } = await sb.from("categories").delete().eq("id", id);
+  if (error) { showToast("ডিলিট ব্যর্থ: " + error.message); return; }
+  await loadData(); renderAdmin();
 }
 
-function buildModalHTML(count, required){
-  let steps='';
-  for(let i=0;i<required;i++){
-    if(i>0) steps+=`<div class="step-line${i<=count?' done':''}"></div>`;
-    const cls=i<count?'done':i===count?'active':'';
-    steps+=`<div class="ad-step ${cls}">${i<count?'✓':i+1}</div>`;
-  }
-  return `<div class="ad-modal">
-    <div class="modal-handle"></div>
-    <div class="modal-head">
-      <div class="modal-ico">🔓</div>
-      <div class="modal-title">লিংক আনলক করুন</div>
-      <div class="modal-sub">বিজ্ঞাপন দেখে বিনামূল্যে কন্টেন্ট আনলক করুন</div>
-    </div>
-    <div class="ad-steps" id="am-steps">${steps}</div>
-    <div class="ad-status" id="am-status">
-      <div class="ad-status-txt">বিজ্ঞাপন দেখুন এবং <b>${count+1}/${required}</b> ধাপ সম্পন্ন করুন</div>
-    </div>
-    <button class="ad-cta" id="am-cta">বিজ্ঞাপন দেখুন (${count+1}/${required})</button>
-    <div class="modal-close-row">
-      <button id="am-close">পরে করব</button>
-    </div>
-  </div>`;
-}
-
-/* ══════════════════════════════════════════════════════════════════
-   MAIN APP
-══════════════════════════════════════════════════════════════════ */
-let currentUser=null, currentCat=null, feedPage=0, loading=false, hasMore=true;
-let settings={};
-
-async function initMain(){
-  tgInit();
-  const u = tgUser();
-
-  // Load settings first (to get unlock count, monetag zone, etc.)
-  try { settings = await getSettings(); } catch(e){}
-  applySettings();
-
-  // Load Monetag script early
-  if(C.MONETAG_ZONE_ID) loadMonetagScript(C.MONETAG_ZONE_ID);
-
-  if(u?.id){
-    try {
-      currentUser = await upsertUser(u.id, u.username, u.firstName);
-      if(currentUser?.is_banned){ showBanned(); return; }
-    } catch(e){ console.warn('User upsert failed', e); }
-  }
-
-  const avatar = document.getElementById('user-avatar');
-  const uname  = document.getElementById('user-name');
-  avatar.textContent = (u.firstName||'U')[0].toUpperCase();
-  uname.textContent  = u.firstName;
-
-  // Update app title from settings
-  const appName = settings.app_name || C.APP_NAME;
-  document.getElementById('app-title').textContent = appName;
-  document.title = appName;
-
-  await renderCats();
-  await loadPosts(true);
-
-  window.addEventListener('scroll', onScroll);
-}
-
-function applySettings(){
-  if(settings.unlock_ad_count) C.UNLOCK_AD_COUNT = parseInt(settings.unlock_ad_count)||4;
-  if(settings.monetag_zone_id && settings.monetag_zone_id.trim()) C.MONETAG_ZONE_ID = settings.monetag_zone_id.trim();
-}
-
-function showBanned(){
-  document.getElementById('feed').innerHTML = `
-    <div class="ban-screen">
-      <div class="ban-ico">🚫</div>
-      <div class="ban-ttl">অ্যাক্সেস নিষিদ্ধ</div>
-      <div class="ban-msg">আপনার অ্যাকাউন্ট নিষিদ্ধ করা হয়েছে।<br>অ্যাডমিনের সাথে যোগাযোগ করুন।</div>
-    </div>`;
-}
-
-async function renderCats(){
-  const cats = await getCategories().catch(()=>[]);
-  let h = `<div class="cat-pill active" onclick="filterCat(this,'')">🏠 সব</div>`;
-  cats.forEach(c=>{
-    h += `<div class="cat-pill" onclick="filterCat(this,'${c.id}')">${c.icon||'📁'} ${esc(c.name)}</div>`;
-  });
-  document.getElementById('cat-scroll').innerHTML = h;
-}
-
-window.filterCat = function(el,id){
-  document.querySelectorAll('.cat-pill').forEach(p=>p.classList.remove('active'));
-  el.classList.add('active');
-  currentCat=id||null; feedPage=0; hasMore=true;
-  document.getElementById('feed').innerHTML='';
-  loadPosts(true);
-};
-
-async function loadPosts(reset=false){
-  if(loading||(!hasMore&&!reset)) return;
-  loading=true;
-  const feed    = document.getElementById('feed');
-  const spinner = document.getElementById('load-spinner');
-  if(reset){ feedPage=0; hasMore=true; feed.innerHTML=skelHtml(4); }
-  else spinner.style.display='flex';
-
-  try {
-    const required = C.UNLOCK_AD_COUNT;
-    const posts = await getPosts({ catId:currentCat, page:feedPage, limit:C.ITEMS_PER_PAGE });
-    if(posts.length < C.ITEMS_PER_PAGE) hasMore=false;
-
-    if(!posts.length && feedPage===0){
-      feed.innerHTML = `<div class="empty"><div class="empty-ico">📭</div><div class="empty-ttl">কোনো পোস্ট নেই</div><div class="empty-sub">এখনো কোনো কন্টেন্ট যোগ করা হয়নি।</div></div>`;
-      return;
-    }
-
-    if(reset) feed.innerHTML='';
-
-    // Bulk progress fetch
-    let progressMap={};
-    if(currentUser?.telegram_id && posts.length){
-      const progs = await getBulkProgress(currentUser.telegram_id, posts.map(p=>p.id)).catch(()=>[]);
-      progs.forEach(p=>{ progressMap[p.post_id]=p; });
-    }
-
-    posts.forEach((post,i)=>{
-      const pg       = progressMap[post.id];
-      const wc       = pg?.watch_count||0;
-      const unlocked = pg?.is_unlocked||false;
-      const card     = makeCard(post, wc, unlocked, required);
-      card.style.animationDelay = `${(reset?i:0)*60}ms`;
-      feed.appendChild(card);
-      incView(post.id).catch(()=>{});
-    });
-    feedPage++;
-
-  } catch(err){
-    console.error(err);
-    if(reset) feed.innerHTML='';
-    toast('পোস্ট লোড সমস্যা — রিফ্রেশ করুন','err');
-  } finally {
-    loading=false;
-    spinner.style.display='none';
-    if(!hasMore && feedPage>1){
-      const e=document.createElement('div');
-      e.className='end-note';
-      e.textContent='— সব পোস্ট দেখা হয়েছে —';
-      document.getElementById('feed').appendChild(e);
-    }
-  }
-}
-
-function makeCard(post, wc, unlocked, required){
-  const card = document.createElement('div');
-  card.className = 'post-card';
-  card.dataset.postId = post.id;
-  const pct = unlocked ? 100 : Math.round((wc/required)*100);
-  const cat  = post.categories;
-
-  card.innerHTML = `
-    <div class="post-thumb">
-      ${post.thumbnail
-        ? `<img src="${esc(post.thumbnail)}" alt="${esc(post.title)}" loading="lazy"
-            onerror="this.parentElement.innerHTML='<div class=\\"no-img\\">🎬</div>'">`
-        : '<div class="no-img">🎬</div>'}
-      <div class="post-thumb-ov"></div>
-      ${cat ? `<div class="post-cat">${cat.icon||'📁'} ${esc(cat.name)}</div>` : ''}
-      <div class="post-title-ov">${esc(post.title)}</div>
-    </div>
-    <div class="post-body">
-      <div class="post-stats">
-        <span class="stat-chip">
-          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-            <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-          </svg>
-          ${fmtN(post.views||0)} ভিউ
-        </span>
-        <span class="stat-chip">
-          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-          </svg>
-          ${fmtN(post.downloads||0)} ডাউনলোড
-        </span>
-      </div>
-      <div class="prog-wrap">
-        <div class="prog-label">
-          <span>${unlocked ? '✅ আনলক হয়েছে' : '🔒 আনলক প্রগ্রেস'}</span>
-          <span class="pl-val">${wc}/${required}</span>
-        </div>
-        <div class="prog-bar">
-          <div class="prog-fill${unlocked?' done':''}" style="width:${pct}%"></div>
-        </div>
-      </div>
-      <button class="unlock-btn ${unlocked?'unlocked':'locked'}"
-        onclick="_unlock('${post.id}',${unlocked})" data-pid="${post.id}">
-        ${unlocked
-          ? `<span>✅</span> আনলক হয়েছে`
-          : `<span>🔓</span> আনলক করুন <span class="ucount">${wc}/${required}</span>`}
-      </button>
-      <button class="open-btn${unlocked?' show':''}"
-        onclick="_open('${post.id}','${esc(post.target_url)}')" data-pid="${post.id}">
-        <span>🔗</span> লিংক খুলুন
-      </button>
-    </div>`;
-  return card;
-}
-
-window._unlock = async function(postId, unlocked){
-  if(unlocked) return;
-  if(!currentUser?.telegram_id){ toast('Telegram-এ অ্যাপটি খুলুন','wrn'); return; }
-  tgHaptic('medium');
-  await openAdModal({
-    postId,
-    telegramId: currentUser.telegram_id,
-    required:   C.UNLOCK_AD_COUNT,
-    onProgress: (c)=>updCardProgress(postId, c, C.UNLOCK_AD_COUNT),
-    onUnlocked: ()=>markUnlocked(postId),
-  });
-};
-
-window._open = async function(postId, url){
-  tgHaptic('light');
-  tgOpen(url);
-  if(currentUser?.telegram_id){
-    await incDl(postId).catch(()=>{});
-    await sb.from('downloads').insert({ user_telegram_id:currentUser.telegram_id, post_id:postId }).catch(()=>{});
-  }
-};
-
-function updCardProgress(postId, count, required){
-  const card   = document.querySelector(`.post-card[data-post-id="${postId}"]`);
-  const fillEl = card?.querySelector('.prog-fill');
-  const lblVal = card?.querySelector('.pl-val');
-  const badge  = card?.querySelector('.ucount');
-  const pct    = Math.round((count/required)*100);
-  if(fillEl) fillEl.style.width = `${pct}%`;
-  if(lblVal) lblVal.textContent = `${count}/${required}`;
-  if(badge)  badge.textContent  = `${count}/${required}`;
-}
-
-function markUnlocked(postId){
-  const card = document.querySelector(`.post-card[data-post-id="${postId}"]`);
-  if(!card) return;
-  const btn    = card.querySelector('.unlock-btn');
-  const open   = card.querySelector('.open-btn');
-  const fill   = card.querySelector('.prog-fill');
-  const label  = card.querySelector('.prog-label span:first-child');
-  if(btn){
-    btn.classList.remove('locked'); btn.classList.add('unlocked');
-    btn.innerHTML = '<span>✅</span> আনলক হয়েছে';
-  }
-  if(fill){ fill.style.width='100%'; fill.classList.add('done'); }
-  if(label) label.textContent = '✅ আনলক হয়েছে';
-  if(open)  open.classList.add('show');
-  tgHaptic('success');
-}
-
-function onScroll(){
-  const distFromBottom = document.documentElement.scrollHeight - window.innerHeight - window.scrollY;
-  if(distFromBottom < 300 && !loading && hasMore) loadPosts();
-}
-
-function skelHtml(n){
-  let h='';
-  for(let i=0;i<n;i++){
-    h+=`<div class="skel">
-      <div class="skel-img"></div>
-      <div class="skel-body">
-        <div class="skel-line w80"></div>
-        <div class="skel-line w60"></div>
-        <div class="skel-btn"></div>
-      </div>
-    </div>`;
-  }
-  return h;
-}
-
-window.goHome = function(){ window.location.href='/'; };
-
-/* ══════════════════════════════════════════════════════════════════
-   ADMIN PANEL
-══════════════════════════════════════════════════════════════════ */
-let admSettings={};
-let admAllCats=[], admAllPosts=[], admAllUsers=[];
-let postSearch='', postCatFilter='', postPage=0;
-
-async function initAdmin(){
-  tgInit();
-  const u = tgUser();
-  let adminId = C.ADMIN_TELEGRAM_ID;
-  try {
-    admSettings = await getSettings();
-    if(admSettings.admin_telegram_id) adminId = parseInt(admSettings.admin_telegram_id)||0;
-  } catch(e){}
-
-  const allowed = u?.id && u.id === adminId;
-  document.getElementById('adm-inner').style.display    = allowed ? 'block':'none';
-  document.getElementById('access-denied').style.display= allowed ? 'none':'flex';
-  document.getElementById('loading-screen').classList.add('hide');
-  if(!allowed) return;
-  admTab('dashboard');
-}
-
-window.admTab = function(tab){
-  document.querySelectorAll('.adm-tab-btn').forEach(b=>b.classList.remove('active'));
-  document.querySelectorAll('.adm-pane').forEach(p=>p.classList.remove('active'));
-  const btn = document.querySelector(`[data-tab="${tab}"]`);
-  if(btn) btn.classList.add('active');
-  const pane = document.getElementById(`pane-${tab}`);
-  if(pane) pane.classList.add('active');
-  switch(tab){
-    case 'dashboard':  loadDash();        break;
-    case 'categories': loadAdmCats();     break;
-    case 'posts':      loadAdmPosts();    break;
-    case 'users':      loadAdmUsers();    break;
-    case 'stats':      loadAdmStats();    break;
-    case 'settings':   loadAdmSettings(); break;
-  }
-};
-
-/* Dashboard */
-async function loadDash(){
-  const el=document.getElementById('pane-dashboard');
-  el.innerHTML=`<div class="spin-wrap"><div class="spin"></div></div>`;
-  try {
-    const s=await getAdminStats();
-    el.innerHTML=`<div class="stats-grid">
-      <div class="stat-card"><div class="sc-lbl">মোট পোস্ট</div><div class="sc-val acc">${s.posts}</div></div>
-      <div class="stat-card"><div class="sc-lbl">ক্যাটাগরি</div><div class="sc-val info">${s.categories}</div></div>
-      <div class="stat-card"><div class="sc-lbl">ব্যবহারকারী</div><div class="sc-val">${s.users}</div></div>
-      <div class="stat-card"><div class="sc-lbl">আনলক হয়েছে</div><div class="sc-val ok">${s.unlocks}</div></div>
-      <div class="stat-card"><div class="sc-lbl">মোট ভিউ</div><div class="sc-val warn">${fmtN(s.totalViews)}</div></div>
-      <div class="stat-card"><div class="sc-lbl">মোট ডাউনলোড</div><div class="sc-val info">${fmtN(s.totalDownloads)}</div></div>
-    </div>`;
-  } catch(e){ el.innerHTML=errHtml(); }
-}
-
-/* Categories */
-async function loadAdmCats(){
-  const el=document.getElementById('pane-categories');
-  el.innerHTML=`<div class="sec-hdr">
-    <span class="sec-ttl">ক্যাটাগরি</span>
-    <button class="btn btn-pr btn-sm" onclick="openCatForm()">+ নতুন</button>
-  </div><div id="cat-list"><div class="spin-wrap"><div class="spin"></div></div></div>`;
-  admAllCats = await getCategories(false).catch(()=>[]);
-  renderCatList();
-}
-
-function renderCatList(){
-  const el=document.getElementById('cat-list');
-  if(!admAllCats.length){ el.innerHTML=emptyHtml('📁','কোনো ক্যাটাগরি নেই'); return; }
-  el.innerHTML=admAllCats.map(c=>`
-    <div class="adm-item">
-      <div class="adm-thumb">${c.icon||'📁'}</div>
-      <div class="adm-info">
-        <div class="adm-item-ttl">${esc(c.name)}</div>
-        <div class="adm-meta">
-          <span>ক্রম: ${c.sort_order}</span>
-          <span class="badge ${c.is_enabled?'bg':'br'}">${c.is_enabled?'সক্রিয়':'বন্ধ'}</span>
-        </div>
-      </div>
-      <div class="adm-acts">
-        <button class="btn btn-gh btn-sm btn-ico" onclick="openCatForm('${c.id}')">✏️</button>
-        <button class="btn btn-er btn-sm btn-ico" onclick="cfmDelCat('${c.id}')">🗑️</button>
-      </div>
-    </div>`).join('');
-}
-
-window.openCatForm = function(id=null){
-  const c = id ? admAllCats.find(x=>x.id===id) : null;
-  openFM(id?'ক্যাটাগরি সম্পাদনা':'নতুন ক্যাটাগরি',`
-    <div class="fg">
-      <label class="fl">নাম *</label>
-      <input class="fi" id="cf-name" placeholder="ক্যাটাগরির নাম" value="${esc(c?.name||'')}">
-    </div>
-    <div class="frow">
-      <div class="fg">
-        <label class="fl">আইকন (ইমোজি)</label>
-        <input class="fi" id="cf-icon" placeholder="📁" value="${esc(c?.icon||'📁')}" maxlength="4">
-      </div>
-      <div class="fg">
-        <label class="fl">ক্রম নম্বর</label>
-        <input class="fi" id="cf-order" type="number" value="${c?.sort_order||0}">
-      </div>
-    </div>
-    <div class="fg" style="display:flex;align-items:center;justify-content:space-between">
-      <div>
-        <label class="fl" style="margin:0">সক্রিয়</label>
-        <div style="font-size:11px;color:var(--txt3);margin-top:2px">বন্ধ করলে ফিডে দেখাবে না</div>
-      </div>
-      <label class="tgl">
-        <input type="checkbox" id="cf-en" ${c?.is_enabled!==false?'checked':''}>
-        <span class="tgl-sl"></span>
-      </label>
-    </div>`,
-    async()=>{
-      const name=document.getElementById('cf-name').value.trim();
-      if(!name){ toast('নাম দিন','err'); return; }
-      try{
-        const data={
-          name,
-          icon:document.getElementById('cf-icon').value.trim()||'📁',
-          sort_order:parseInt(document.getElementById('cf-order').value)||0,
-          is_enabled:document.getElementById('cf-en').checked
-        };
-        if(id) await updateCat(id,data); else await createCat(data);
-        closeFM(); toast(id?'আপডেট হয়েছে':'ক্যাটাগরি যোগ হয়েছে','ok'); loadAdmCats();
-      } catch(e){ toast('সমস্যা হয়েছে: '+e.message,'err'); }
-    }
-  );
-};
-
-window.cfmDelCat = function(id){
-  const c=admAllCats.find(x=>x.id===id);
-  openCF(`"${c?.name}" মুছবেন?`,'সব পোস্ট আনক্যাটাগরাইজড হবে।','🗑️',async()=>{
-    try{ await deleteCat(id); toast('মুছা হয়েছে','ok'); loadAdmCats(); }
-    catch(e){ toast('সমস্যা','err'); }
-  });
-};
-
-/* Posts */
-async function loadAdmPosts(){
-  const cats = await getCategories(false).catch(()=>[]);
-  const el   = document.getElementById('pane-posts');
-  el.innerHTML=`
-    <div class="sec-hdr">
-      <span class="sec-ttl">পোস্ট</span>
-      <button class="btn btn-pr btn-sm" onclick="openPostForm()">+ নতুন</button>
-    </div>
-    <div class="search-row">
-      <span>🔍</span>
-      <input id="ps-search" placeholder="শিরোনাম খুঁজুন..." oninput="onPSearch(this.value)">
-    </div>
-    <select class="fi" style="margin-bottom:12px;font-size:13px" onchange="onPCat(this.value)">
-      <option value="">সব ক্যাটাগরি</option>
-      ${cats.map(c=>`<option value="${c.id}">${c.icon} ${esc(c.name)}</option>`).join('')}
-    </select>
-    <div id="post-list"></div>`;
-  postPage=0; postSearch=''; postCatFilter='';
-  await fetchAdmPosts(true);
-}
-
-async function fetchAdmPosts(reset=false){
-  if(reset) postPage=0;
-  const list=document.getElementById('post-list');
-  if(reset) list.innerHTML=`<div class="spin-wrap"><div class="spin"></div></div>`;
-  const posts=await getAllPosts({search:postSearch,catId:postCatFilter,page:postPage,limit:20}).catch(()=>[]);
-  if(reset) admAllPosts=posts; else admAllPosts=[...admAllPosts,...posts];
-  if(!admAllPosts.length){ list.innerHTML=emptyHtml('📭','কোনো পোস্ট নেই'); return; }
-  list.innerHTML=admAllPosts.map(p=>`
-    <div class="adm-item">
-      <div class="adm-thumb">${p.thumbnail?`<img src="${esc(p.thumbnail)}" alt="">`:'🎬'}</div>
-      <div class="adm-info">
-        <div class="adm-item-ttl">${esc(p.title)}</div>
-        <div class="adm-meta">
-          <span>👁️ ${fmtN(p.views)}</span>
-          <span>⬇️ ${fmtN(p.downloads)}</span>
-          <span class="badge ${p.is_enabled?'bg':'br'}">${p.is_enabled?'সক্রিয়':'বন্ধ'}</span>
-        </div>
-      </div>
-      <div class="adm-acts">
-        <button class="btn btn-gh btn-sm btn-ico" onclick="openPostForm('${p.id}')">✏️</button>
-        <button class="btn btn-er btn-sm btn-ico" onclick="cfmDelPost('${p.id}')">🗑️</button>
-      </div>
-    </div>`).join('')+
-    (posts.length===20?`<button class="btn btn-gh" style="width:100%;justify-content:center;margin-top:8px" onclick="morePosts()">আরো লোড করুন</button>`:'');
-}
-
-window.onPSearch  = v=>{ postSearch=v; postPage=0; fetchAdmPosts(true); };
-window.onPCat     = v=>{ postCatFilter=v; postPage=0; fetchAdmPosts(true); };
-window.morePosts  = ()=>{ postPage++; fetchAdmPosts(false); };
-
-window.openPostForm = async function(id=null){
-  const p    = id ? admAllPosts.find(x=>x.id===id) : null;
-  const cats = await getCategories(false).catch(()=>[]);
-  const catOpts = cats.map(c=>`<option value="${c.id}"${p?.category_id===c.id?' selected':''}>${c.icon} ${esc(c.name)}</option>`).join('');
-  openFM(id?'পোস্ট সম্পাদনা':'নতুন পোস্ট',`
-    <div class="fg">
-      <label class="fl">শিরোনাম *</label>
-      <input class="fi" id="pf-t" placeholder="পোস্টের শিরোনাম" value="${esc(p?.title||'')}">
-    </div>
-    <div class="fg">
-      <label class="fl">থাম্বনেইল URL</label>
-      <input class="fi" id="pf-th" type="url" placeholder="https://..." value="${esc(p?.thumbnail||'')}">
-    </div>
-    <div class="fg">
-      <label class="fl">টার্গেট URL *</label>
-      <input class="fi" id="pf-u" type="url" placeholder="https://..." value="${esc(p?.target_url||'')}">
-    </div>
-    <div class="fg">
-      <label class="fl">ক্যাটাগরি</label>
-      <select class="fi" id="pf-c">
-        <option value="">বিভাগ নেই</option>${catOpts}
-      </select>
-    </div>
-    <div class="fg" style="display:flex;align-items:center;justify-content:space-between">
-      <label class="fl" style="margin:0">সক্রিয়</label>
-      <label class="tgl"><input type="checkbox" id="pf-en" ${p?.is_enabled!==false?'checked':''}><span class="tgl-sl"></span></label>
-    </div>
-    ${id?`<div style="display:flex;gap:8px;margin-top:4px">
-      <button class="btn btn-gh btn-sm" style="flex:1" onclick="doResetStat('${id}','views')">ভিউ রিসেট</button>
-      <button class="btn btn-gh btn-sm" style="flex:1" onclick="doResetStat('${id}','downloads')">ডাউনলোড রিসেট</button>
-    </div>`:''}`,
-    async()=>{
-      const title = document.getElementById('pf-t').value.trim();
-      const url   = document.getElementById('pf-u').value.trim();
-      if(!title||!url){ toast('শিরোনাম ও URL দিন','err'); return; }
-      try{
-        const data={
-          title, thumbnail:document.getElementById('pf-th').value.trim()||null,
-          target_url:url,
-          category_id:document.getElementById('pf-c').value||null,
-          is_enabled:document.getElementById('pf-en').checked
-        };
-        if(id) await updatePost(id,data); else await createPost(data);
-        closeFM(); toast(id?'আপডেট হয়েছে':'পোস্ট যোগ হয়েছে','ok'); fetchAdmPosts(true);
-      } catch(e){ toast('সমস্যা: '+e.message,'err'); }
-    }
-  );
-};
-
-window.doResetStat = async function(id,field){
-  try{ await resetStat(id,field); toast('রিসেট হয়েছে','ok'); fetchAdmPosts(true); }
-  catch(e){ toast('সমস্যা','err'); }
-};
-
-window.cfmDelPost = function(id){
-  const p=admAllPosts.find(x=>x.id===id);
-  openCF(`"${p?.title||'পোস্ট'}" মুছবেন?`,'এটি স্থায়ীভাবে মুছে যাবে।','🗑️',async()=>{
-    try{ await deletePost(id); toast('মুছা হয়েছে','ok'); fetchAdmPosts(true); }
-    catch(e){ toast('সমস্যা','err'); }
-  });
-};
-
-/* Users */
-async function loadAdmUsers(){
-  const el=document.getElementById('pane-users');
-  el.innerHTML=`<div class="sec-hdr"><span class="sec-ttl">ব্যবহারকারী</span></div>
-    <div class="search-row"><span>🔍</span><input id="us-s" placeholder="নাম বা @ইউজারনেম..." oninput="onUsrS(this.value)"></div>
-    <div id="usr-list"><div class="spin-wrap"><div class="spin"></div></div></div>`;
-  admAllUsers=await getUsers().catch(()=>[]);
-  renderUsrList();
-}
-
-function renderUsrList(){
-  const el=document.getElementById('usr-list');
-  if(!admAllUsers.length){ el.innerHTML=emptyHtml('👥','কোনো ব্যবহারকারী নেই'); return; }
-  el.innerHTML=admAllUsers.map(u=>`
-    <div class="adm-item">
-      <div class="adm-thumb" style="background:linear-gradient(135deg,#6366f1,#a78bfa);border-radius:50%;font-size:14px;font-weight:700;color:#fff">
-        ${(u.first_name||'U')[0].toUpperCase()}
-      </div>
-      <div class="adm-info">
-        <div class="adm-item-ttl">
-          ${esc(u.first_name||'User')}${u.username?` <span style="color:var(--txt3);font-weight:400">@${esc(u.username)}</span>`:''}
-          ${u.is_banned?'<span class="badge br">নিষিদ্ধ</span>':''}
-        </div>
-        <div class="adm-meta">ID: ${u.telegram_id} · যোগ: ${dateStr(u.created_at)}</div>
-      </div>
-      <div class="adm-acts">
-        ${u.is_banned
-          ?`<button class="btn btn-ok btn-sm" onclick="doUnban(${u.telegram_id})">আনব্যান</button>`
-          :`<button class="btn btn-er btn-sm" onclick="doBan(${u.telegram_id})">ব্যান</button>`}
-        <button class="btn btn-gh btn-sm btn-ico" title="প্রগ্রেস রিসেট" onclick="doResetProg(${u.telegram_id})">🔄</button>
-      </div>
-    </div>`).join('');
-}
-
-window.onUsrS    = async v=>{ admAllUsers=await getUsers({search:v}).catch(()=>[]); renderUsrList(); };
-window.doBan     = id=>openCF('ব্যান করবেন?',`Telegram ID: ${id}`,'🚫',async()=>{ try{await banUser(id);toast('ব্যান হয়েছে','ok');loadAdmUsers();}catch(e){toast('সমস্যা','err');} });
-window.doUnban   = async id=>{ try{await unbanUser(id);toast('আনব্যান হয়েছে','ok');loadAdmUsers();}catch(e){toast('সমস্যা','err');} };
-window.doResetProg = id=>openCF('প্রগ্রেস রিসেট?',`ID ${id}-র সব আনলক প্রগ্রেস মুছবে।`,'🔄',async()=>{ try{await resetProgress(id);toast('রিসেট হয়েছে','ok');}catch(e){toast('সমস্যা','err');} });
-
-/* Stats */
-async function loadAdmStats(){
-  const el=document.getElementById('pane-stats');
-  el.innerHTML=`<div class="spin-wrap"><div class="spin"></div></div>`;
-  try{
-    const [stats,daily]=await Promise.all([getAdminStats(),getDailyStats(7)]);
-    const days  = last7days();
-    const counts= days.map(d=>daily.filter(r=>r.downloaded_at?.startsWith(d)).length);
-    const mx    = Math.max(...counts,1);
-    el.innerHTML=`
-      <div class="stats-grid">
-        <div class="stat-card"><div class="sc-lbl">মোট ভিউ</div><div class="sc-val warn">${fmtN(stats.totalViews)}</div></div>
-        <div class="stat-card"><div class="sc-lbl">মোট ডাউনলোড</div><div class="sc-val info">${fmtN(stats.totalDownloads)}</div></div>
-        <div class="stat-card"><div class="sc-lbl">মোট আনলক</div><div class="sc-val ok">${fmtN(stats.unlocks)}</div></div>
-        <div class="stat-card"><div class="sc-lbl">ব্যবহারকারী</div><div class="sc-val">${fmtN(stats.users)}</div></div>
-      </div>
-      <div class="chart-card">
-        <div class="chart-ttl">গত ৭ দিনের ডাউনলোড</div>
-        <div class="bar-chart">
-          ${days.map((d,i)=>`
-            <div class="bar-item">
-              <div class="bar-fill" style="height:${Math.round((counts[i]/mx)*72)+4}px"></div>
-              <div class="bar-lbl">${d.slice(5).replace('-','/')}</div>
-            </div>`).join('')}
-        </div>
-      </div>`;
-  }catch(e){ el.innerHTML=errHtml(); }
-}
-
-function last7days(){
-  return Array.from({length:7},(_,i)=>{
-    const d=new Date(); d.setDate(d.getDate()-(6-i));
-    return d.toISOString().slice(0,10);
-  });
-}
-
-/* Settings */
-async function loadAdmSettings(){
-  const el=document.getElementById('pane-settings');
-  const s=await getSettings().catch(()=>({}));
-  el.innerHTML=`<div class="sec-ttl" style="margin-bottom:16px">⚙️ সেটিংস</div>
-    ${setRow('অ্যাডমিন Telegram ID','admin_telegram_id',s.admin_telegram_id||String(C.ADMIN_TELEGRAM_ID),'আপনার Telegram User ID (https://t.me/userinfobot)','number')}
-    ${setRow('আনলক বিজ্ঞাপন সংখ্যা','unlock_ad_count',s.unlock_ad_count||String(C.UNLOCK_AD_COUNT),'কতটি বিজ্ঞাপন দেখলে unlock হবে','number')}
-    ${setRow('Monetag Zone ID','monetag_zone_id',s.monetag_zone_id||C.MONETAG_ZONE_ID,'Rewarded Interstitial Zone ID (শুধু নম্বর, যেমন: 11394615)')}
-    ${setRow('অ্যাপের নাম','app_name',s.app_name||C.APP_NAME,'ফিডের উপরে অ্যাপের নাম')}
-    <div style="margin-top:16px;padding:14px;background:var(--bg3);border:1px solid var(--br);border-radius:var(--r)">
-      <div class="sc-lbl">💡 Monetag সেটআপ</div>
-      <div style="font-size:12px;color:var(--txt3);margin-top:6px;line-height:1.7">
-        ১. monetag.com → Zone তৈরি করুন (Rewarded Interstitial)<br>
-        ২. Zone ID কপি করুন (যেমন: <b style="color:var(--acc)">11394615</b>)<br>
-        ৩. উপরের "Monetag Zone ID" ফিল্ডে সেভ করুন<br>
-        ৪. অ্যাপের config-এও একই ID দিন
-      </div>
-    </div>`;
-}
-
-function setRow(label,key,val,desc,type='text'){
-  return`<div class="set-item">
-    <div class="set-info">
-      <div class="set-lbl">${label}</div>
-      <div class="set-desc">${desc}</div>
-    </div>
-    <div class="set-ctl">
-      <input class="fi" id="s-${key}" type="${type}" value="${esc(val)}" style="width:120px;font-size:12px">
-      <button class="btn btn-pr btn-sm" onclick="doSave('${key}')">সেভ</button>
-    </div>
-  </div>`;
-}
-
-window.doSave = async function(key){
-  const val=document.getElementById(`s-${key}`)?.value;
-  if(val===undefined) return;
-  try{
-    await updSetting(key,val);
-    admSettings[key]=val;
-    if(key==='unlock_ad_count') C.UNLOCK_AD_COUNT=parseInt(val)||4;
-    if(key==='monetag_zone_id'){ C.MONETAG_ZONE_ID=val; if(val) loadMonetagScript(val); }
-    toast('সংরক্ষণ হয়েছে','ok');
-  } catch(e){ toast('সমস্যা হয়েছে','err'); }
-};
-
-/* ── Form Modal ── */
-let _fm=null;
-function openFM(title,body,onSave){
-  const ov=document.createElement('div');
-  ov.className='fm-ov'; ov.id='fm-ov';
-  ov.innerHTML=`<div class="fm-box">
-    <div class="fm-handle"></div>
-    <div class="fm-ttl">${title}</div>
-    ${body}
-    <div class="fm-acts">
-      <button class="btn btn-gh" onclick="closeFM()">বাতিল</button>
-      <button class="btn btn-pr" id="fm-save">সংরক্ষণ করুন</button>
-    </div>
-  </div>`;
-  _fm=ov;
-  document.body.appendChild(ov);
-  requestAnimationFrame(()=>ov.classList.add('on'));
-  ov.addEventListener('click',e=>{ if(e.target===ov) closeFM(); });
-  document.getElementById('fm-save').addEventListener('click',onSave);
-}
-window.closeFM=function(){
-  if(!_fm) return;
-  _fm.classList.remove('on');
-  setTimeout(()=>{ _fm?.remove(); _fm=null; },300);
-};
-
-/* ── Confirm Dialog ── */
-function openCF(title,msg,icon,onOk){
-  const ov=document.createElement('div');
-  ov.className='cf-ov';
-  ov.innerHTML=`<div class="cf-box">
-    <div class="cf-ico">${icon}</div>
-    <div class="cf-ttl">${title}</div>
-    <div class="cf-msg">${msg}</div>
-    <div class="cf-acts">
-      <button class="btn btn-gh" id="cf-no">বাতিল</button>
-      <button class="btn btn-er" id="cf-yes">নিশ্চিত</button>
-    </div>
-  </div>`;
-  document.body.appendChild(ov);
-  requestAnimationFrame(()=>ov.classList.add('on'));
-  const close=()=>{ ov.classList.remove('on'); setTimeout(()=>ov.remove(),250); };
-  document.getElementById('cf-no').onclick=close;
-  document.getElementById('cf-yes').onclick=()=>{ close(); onOk(); };
-}
-
-/* ── Helpers ── */
-function emptyHtml(ico,msg){ return`<div class="empty"><div class="empty-ico">${ico}</div><div class="empty-ttl">${msg}</div></div>` }
-function errHtml(){          return`<div class="empty"><div class="empty-ico">⚠️</div><div class="empty-ttl">ডেটা লোড সমস্যা</div><div class="empty-sub">পেজ রিফ্রেশ করুন।</div></div>` }
-
-/* ══════════════════════════════════════════════════════════════════
-   BOOT
-══════════════════════════════════════════════════════════════════ */
-if(isAdmin){
-  document.getElementById('main-app').style.display  = 'none';
-  document.getElementById('admin-app').style.display = 'block';
-  initAdmin().catch(e=>{ console.error(e); });
-} else {
-  document.getElementById('admin-app').style.display = 'none';
-  initMain().catch(e=>{
-    console.error(e);
-    toast('অ্যাপ লোড সমস্যা — পেজ রিফ্রেশ করুন','err');
-  });
-}
+/* ---------- Start ---------- */
+loadData();
 </script>
 </body>
 </html>
