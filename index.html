@@ -1,5 +1,3 @@
---- START OF FILE Paste July 27, 2026 - 12:59PM ---
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -73,7 +71,6 @@
   .cta{width:100%;padding:13px;border:none;border-radius:13px;background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;font-size:14.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:transform .12s,box-shadow .15s;box-shadow:0 4px 14px rgba(79,70,229,.3);font-family:inherit}
   .cta:active{transform:scale(.97)}
   .cta.done{background:linear-gradient(135deg,#059669,#10b981);box-shadow:0 4px 14px rgba(16,185,129,.3)}
-  .cta:disabled{opacity:0.8;cursor:not-allowed;transform:none}
 
   .empty{text-align:center;color:var(--muted);padding:50px 20px;font-size:14.5px}
 
@@ -493,8 +490,6 @@ async function saveSettings() {
 
 /* ---------- State ---------- */
 let posts = [], cats = [], activeCat = "all", currentUnlockPost = null;
-let cooldownActive = false, currentCooldownId = null, cooldownTime = 0; // Cooldown state
-
 const demoData = () => {
   posts = [
     { id: 1, title: "Demo Post 1 (8 min 21 sec)", description: "This is a demo post — connect Supabase to load real data.", thumbnail_url: "", link_url: "https://example.com", category_id: null, is_trending: true, views: 22100, downloads: 40500 },
@@ -562,7 +557,6 @@ function cardHTML(p, topRank) {
   const prog = getProgress(p.id);
   const unlocked = prog >= REQ;
   const busy = adBusyPostId == p.id;
-  const inCooldown = cooldownActive && currentCooldownId == p.id; // Check cooldown
   const thumb = p.thumbnail_url
     ? `<img src="${esc(p.thumbnail_url)}" loading="lazy" onerror="this.outerHTML='<div class=thumb-ph>${ICON_FILM.replace(/"/g, "&quot;")}</div>'" />`
     : `<div class="thumb-ph">${ICON_FILM}</div>`;
@@ -575,8 +569,8 @@ function cardHTML(p, topRank) {
     </div>
     <h3>${esc(p.title)}</h3>
     ${p.description ? `<div class="desc">${esc(p.description)}</div>` : ""}
-    <button class="cta ${unlocked ? "done" : ""}" onclick="startUnlock(${p.id})" ${busy || inCooldown ? "disabled" : ""}>
-      ${busy ? "Loading Ad..." : inCooldown ? `Wait (${cooldownTime}s)` : unlocked ? ICON_CHECK + " Watch & Download" : ICON_LOCK + ` Unlock Link (${prog}/${REQ})`}
+    <button class="cta ${unlocked ? "done" : ""}" onclick="startUnlock(${p.id})" ${busy ? "disabled" : ""}>
+      ${busy ? "Loading Ad..." : unlocked ? ICON_CHECK + " Watch & Download" : ICON_LOCK + ` Unlock Link (${prog}/${REQ})`}
     </button>
   </div>`;
 }
@@ -587,12 +581,9 @@ const setProgress = (id, v) => localStorage.setItem("unlock_" + id, String(v));
 const viewedThisSession = new Set();
 
 let adBusyPostId = null;
-
 async function startUnlock(id) {
   const p = posts.find(x => x.id == id);
-  // Check if ad is busy or button is in cooldown
-  if (!p || adBusyPostId || (cooldownActive && currentCooldownId === id)) return;
-  
+  if (!p || adBusyPostId) return;
   const REQ = reqFor(p);
   if (!viewedThisSession.has(id)) {
     viewedThisSession.add(id);
@@ -601,6 +592,7 @@ async function startUnlock(id) {
   }
   if (getProgress(id) >= REQ) { goToLink(p); return; }
 
+  // Directly load and show the real ad — no confirmation popup
   adBusyPostId = id; render();
   const done = () => { adBusyPostId = null; render(); };
   const fn = await waitForSdk();
@@ -608,34 +600,14 @@ async function startUnlock(id) {
   fn().then(() => {
     setProgress(id, getProgress(id) + 1);
     const prog = getProgress(id);
-    
+    done();
     if (prog >= REQ) {
-      done();
       showToast("🎉 Unlocked!");
       setTimeout(() => goToLink(p), 900);
     } else {
-      adBusyPostId = null; // Clear busy state
       showToast(`✅ Ad ${prog}/${REQ} done`);
-      startCooldown(id, 5); // Start 5s cooldown
     }
   }).catch(() => { done(); showToast("Ad failed to load. Please try again."); });
-}
-
-function startCooldown(id, seconds) {
-  cooldownActive = true;
-  currentCooldownId = id;
-  cooldownTime = seconds;
-  render();
-
-  const iv = setInterval(() => {
-    cooldownTime--;
-    if (cooldownTime <= 0) {
-      clearInterval(iv);
-      cooldownActive = false;
-      currentCooldownId = null;
-    }
-    render();
-  }, 1000);
 }
 
 async function goToLink(p) {
