@@ -570,10 +570,30 @@ function cardHTML(p, topRank) {
     </div>
     <h3>${esc(p.title)}</h3>
     ${p.description ? `<div class="desc">${esc(p.description)}</div>` : ""}
-    <button class="cta ${unlocked ? "done" : ""}" onclick="startUnlock(${p.id})" ${busy || cd ? "disabled" : ""} ${cd ? 'style="opacity:.65"' : ""}>
-      ${busy ? "Loading Ad..." : cd ? `⏳ Next ad in ${cd}s...` : unlocked ? ICON_CHECK + " Watch & Download" : ICON_LOCK + ` Unlock Link (${prog}/${REQ})`}
+    <button class="cta ${unlocked ? "done" : ""}" data-cta="${p.id}" onclick="startUnlock(${p.id})" ${busy || cd ? "disabled" : ""} ${cd ? 'style="opacity:.65"' : ""}>
+      ${ctaLabel(p, { busy, cd, unlocked, prog, REQ })}
     </button>
   </div>`;
+}
+function ctaLabel(p, s) {
+  if (s.busy) return "Loading Ad...";
+  if (s.cd) return `⏳ Next ad in ${s.cd}s...`;
+  if (s.unlocked) return ICON_CHECK + " Watch & Download";
+  return ICON_LOCK + ` Unlock Link (${s.prog}/${s.REQ})`;
+}
+/* Update ONLY the unlock buttons (no full re-render → no page jump) */
+function refreshCtaButtons() {
+  document.querySelectorAll("[data-cta]").forEach(btn => {
+    const id = btn.dataset.cta;
+    const p = posts.find(x => x.id == id);
+    if (!p) return;
+    const REQ = reqFor(p), prog = getProgress(id);
+    const st = { busy: adBusyPostId == id, cd: cooldownLeft(id), unlocked: prog >= REQ, prog, REQ };
+    btn.innerHTML = ctaLabel(p, st);
+    btn.disabled = !!(st.busy || st.cd);
+    btn.style.opacity = st.cd ? ".65" : "";
+    btn.classList.toggle("done", st.unlocked);
+  });
 }
 
 /* ---------- Unlock flow ---------- */
@@ -591,13 +611,23 @@ function cooldownLeft(id) {
 }
 function startCooldown(id) {
   cooldowns[id] = Date.now() + AD_COOLDOWN_SEC * 1000;
-  render();
+  refreshCtaButtons();
   if (cdTimer) return;               // one shared ticker for all cooldowns
   cdTimer = setInterval(() => {
     const anyActive = Object.keys(cooldowns).some(k => cooldownLeft(k) > 0);
-    render();
+    refreshCtaButtons();             // only buttons update — page never jumps
     if (!anyActive) { clearInterval(cdTimer); cdTimer = null; }
   }, 1000);
+}
+/* Start the cooldown only AFTER the user is back in the app from the ad */
+function startCooldownWhenBack(id) {
+  if (document.visibilityState === "visible") { startCooldown(id); return; }
+  const onBack = () => {
+    if (document.visibilityState !== "visible") return;
+    document.removeEventListener("visibilitychange", onBack);
+    startCooldown(id);
+  };
+  document.addEventListener("visibilitychange", onBack);
 }
 
 let adBusyPostId = null;
@@ -613,8 +643,8 @@ async function startUnlock(id) {
   if (getProgress(id) >= REQ) { goToLink(p); return; }
 
   // Directly load and show the real ad — no confirmation popup
-  adBusyPostId = id; render();
-  const done = () => { adBusyPostId = null; render(); };
+  adBusyPostId = id; refreshCtaButtons();
+  const done = () => { adBusyPostId = null; refreshCtaButtons(); };
   const fn = await waitForSdk();
   if (!fn) { done(); showToast("Ads are unavailable right now. Please try again in a moment."); return; }
   fn().then(() => {
@@ -626,7 +656,7 @@ async function startUnlock(id) {
       setTimeout(() => goToLink(p), 900);
     } else {
       showToast(`✅ Ad ${prog}/${REQ} done`);
-      startCooldown(id);
+      startCooldownWhenBack(id);
     }
   }).catch(() => { done(); showToast("Ad failed to load. Please try again."); });
 }
