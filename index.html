@@ -557,6 +557,7 @@ function cardHTML(p, topRank) {
   const prog = getProgress(p.id);
   const unlocked = prog >= REQ;
   const busy = adBusyPostId == p.id;
+  const cd = cooldownLeft(p.id);
   const thumb = p.thumbnail_url
     ? `<img src="${esc(p.thumbnail_url)}" loading="lazy" onerror="this.outerHTML='<div class=thumb-ph>${ICON_FILM.replace(/"/g, "&quot;")}</div>'" />`
     : `<div class="thumb-ph">${ICON_FILM}</div>`;
@@ -569,8 +570,8 @@ function cardHTML(p, topRank) {
     </div>
     <h3>${esc(p.title)}</h3>
     ${p.description ? `<div class="desc">${esc(p.description)}</div>` : ""}
-    <button class="cta ${unlocked ? "done" : ""}" onclick="startUnlock(${p.id})" ${busy ? "disabled" : ""}>
-      ${busy ? "Loading Ad..." : unlocked ? ICON_CHECK + " Watch & Download" : ICON_LOCK + ` Unlock Link (${prog}/${REQ})`}
+    <button class="cta ${unlocked ? "done" : ""}" onclick="startUnlock(${p.id})" ${busy || cd ? "disabled" : ""} ${cd ? 'style="opacity:.65"' : ""}>
+      ${busy ? "Loading Ad..." : cd ? `⏳ Next ad in ${cd}s...` : unlocked ? ICON_CHECK + " Watch & Download" : ICON_LOCK + ` Unlock Link (${prog}/${REQ})`}
     </button>
   </div>`;
 }
@@ -580,10 +581,29 @@ const getProgress = id => Number(localStorage.getItem("unlock_" + id) || 0);
 const setProgress = (id, v) => localStorage.setItem("unlock_" + id, String(v));
 const viewedThisSession = new Set();
 
+/* Cooldown between ads (per post) */
+const AD_COOLDOWN_SEC = 5;
+const cooldowns = {};                // post id -> timestamp (ms) until which the button is locked
+let cdTimer = null;
+function cooldownLeft(id) {
+  const left = Math.ceil(((cooldowns[id] || 0) - Date.now()) / 1000);
+  return left > 0 ? left : 0;
+}
+function startCooldown(id) {
+  cooldowns[id] = Date.now() + AD_COOLDOWN_SEC * 1000;
+  render();
+  if (cdTimer) return;               // one shared ticker for all cooldowns
+  cdTimer = setInterval(() => {
+    const anyActive = Object.keys(cooldowns).some(k => cooldownLeft(k) > 0);
+    render();
+    if (!anyActive) { clearInterval(cdTimer); cdTimer = null; }
+  }, 1000);
+}
+
 let adBusyPostId = null;
 async function startUnlock(id) {
   const p = posts.find(x => x.id == id);
-  if (!p || adBusyPostId) return;
+  if (!p || adBusyPostId || cooldownLeft(id) > 0) return;
   const REQ = reqFor(p);
   if (!viewedThisSession.has(id)) {
     viewedThisSession.add(id);
@@ -606,6 +626,7 @@ async function startUnlock(id) {
       setTimeout(() => goToLink(p), 900);
     } else {
       showToast(`✅ Ad ${prog}/${REQ} done`);
+      startCooldown(id);
     }
   }).catch(() => { done(); showToast("Ad failed to load. Please try again."); });
 }
