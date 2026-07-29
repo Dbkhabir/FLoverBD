@@ -602,7 +602,7 @@ const setProgress = (id, v) => localStorage.setItem("unlock_" + id, String(v));
 const viewedThisSession = new Set();
 
 /* Cooldown between ads (per post) */
-const AD_COOLDOWN_SEC = 5;
+const AD_COOLDOWN_SEC = 10;
 const cooldowns = {};                // post id -> timestamp (ms) until which the button is locked
 let cdTimer = null;
 function cooldownLeft(id) {
